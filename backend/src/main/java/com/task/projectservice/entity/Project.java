@@ -23,25 +23,25 @@ public class Project {
     @Column(name = "EndDate")
     private LocalDate endDate;
 
-    // Foreign Key Mapping
+ 
     @ManyToOne
     @JoinColumn(name = "UserID")
-    private User user;
+    private User userId;
 
-    // Constructors
+
     public Project() {}
 
     public Project(Integer projectId, String projectName, String description,
-                   LocalDate startDate, LocalDate endDate, User user) {
+                   LocalDate startDate, LocalDate endDate, User userId) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.user = user;
+        this.userId = userId;
     }
 
-    // Getters and Setters
+
 
     public Integer getProjectId() {
         return projectId;
@@ -84,10 +84,10 @@ public class Project {
     }
 
     public User getUser() {
-        return user;
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(User userId) {
+        this.userId = userId;
     }
 }
