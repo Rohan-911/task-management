@@ -2,6 +2,8 @@ package com.task.projectservice.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.task.projectservice.entity.Project;
+
 public interface ProjectRepository extends JpaRepository<Project, Integer>{
-	public findByUser(Integer userId);
+	public Project findByUser(Integer userId);
 }

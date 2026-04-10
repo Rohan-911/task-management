@@ -26,19 +26,19 @@ public class Project {
  
     @ManyToOne
     @JoinColumn(name = "UserID")
-    private User userId;
+    private User user;
 
 
     public Project() {}
 
     public Project(Integer projectId, String projectName, String description,
-                   LocalDate startDate, LocalDate endDate, User userId) {
+                   LocalDate startDate, LocalDate endDate, User user) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.userId = userId;
+        this.user = user;
     }
 
 
@@ -84,10 +84,10 @@ public class Project {
     }
 
     public User getUser() {
-        return userId;
+        return user;
     }
 
-    public void setUser(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }
