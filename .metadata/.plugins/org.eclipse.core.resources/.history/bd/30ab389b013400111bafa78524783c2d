@@ -1,0 +1,5 @@
+package com.task.projectservice.entity;
+
+public class Project {
+
+}
