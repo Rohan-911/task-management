@@ -29,6 +29,7 @@ public class ProjectService {
                 project.getEndDate(),
                 project.getUser().getUserId(),
                 project.getUser().getUserName() 
+                
         );
     }
 

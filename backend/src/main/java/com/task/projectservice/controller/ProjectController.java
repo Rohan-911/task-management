@@ -13,7 +13,7 @@ import com.task.projectservice.service.ProjectService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/projects")
 public class ProjectController {
 
     private final ProjectService projectService;
