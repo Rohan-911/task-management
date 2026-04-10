@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.task.projectservice.dto.ProjectRequestDto;
-import com.task.projectservice.entity.Project;
+import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -23,28 +23,28 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Project> addProject(@Valid @RequestBody ProjectRequestDto dto) {
+    public ResponseEntity<ProjectResponseDto> addProject(@Valid @RequestBody ProjectRequestDto dto) {
         return new ResponseEntity<>(projectService.addProject(dto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable Integer id) {
+    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Integer id) {
         return ResponseEntity.ok(projectService.getProjectById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Project>> getProjectsByUserId(@PathVariable Integer userId) {
+    public ResponseEntity<List<ProjectResponseDto>> getProjectsByUserId(@PathVariable Integer userId) {
         return ResponseEntity.ok(projectService.getProjectsByUserId(userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getAllProjects() {
+    public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable Integer id,
-                                                 @Valid @RequestBody ProjectRequestDto dto) {
+    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Integer id,
+                                                            @Valid @RequestBody ProjectRequestDto dto) {
         return ResponseEntity.ok(projectService.updateProject(id, dto));
     }
 

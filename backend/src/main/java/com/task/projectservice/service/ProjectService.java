@@ -1,10 +1,11 @@
 package com.task.projectservice.service;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.task.projectservice.dto.ProjectRequestDto;
+import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.entity.Project;
 import com.task.projectservice.repository.ProjectRepository;
 
@@ -19,7 +20,19 @@ public class ProjectService {
         this.userRepository = userRepository;
     }
 
-    public Project addProject(ProjectRequestDto dto) {
+    private ProjectResponseDto mapToDto(Project project) {
+        return new ProjectResponseDto(
+                project.getProjectId(),
+                project.getProjectName(),
+                project.getDescription(),
+                project.getStartDate(),
+                project.getEndDate(),
+                project.getUser().getUserId(),
+                project.getUser().getUserName() 
+        );
+    }
+
+    public ProjectResponseDto addProject(ProjectRequestDto dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -31,23 +44,31 @@ public class ProjectService {
         project.setEndDate(dto.getEndDate());
         project.setUser(user);
 
-        return projectRepository.save(project);
+        return mapToDto(projectRepository.save(project));
     }
 
-    public Project getProjectById(Integer projectId) {
-        return projectRepository.findById(projectId)
+    public ProjectResponseDto getProjectById(Integer projectId) {
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        return mapToDto(project);
     }
 
-    public List<Project> getProjectsByUserId(Integer userId) {
-        return projectRepository.findByUserUserId(userId);
+    public List<ProjectResponseDto> getProjectsByUserId(Integer userId) {
+        return projectRepository.findByUserUserId(userId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
-    public List<Project> getAllProjects() {
-        return projectRepository.findAll();
+    public List<ProjectResponseDto> getAllProjects() {
+        return projectRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
-    public Project updateProject(Integer projectId, ProjectRequestDto dto) {
+    public ProjectResponseDto updateProject(Integer projectId, ProjectRequestDto dto) {
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
@@ -60,7 +81,7 @@ public class ProjectService {
         existingProject.setEndDate(dto.getEndDate());
         existingProject.setUser(user);
 
-        return projectRepository.save(existingProject);
+        return mapToDto(projectRepository.save(existingProject));
     }
 
     public void deleteProject(Integer projectId) {
@@ -69,4 +90,5 @@ public class ProjectService {
         }
         projectRepository.deleteById(projectId);
     }
+}
 }
