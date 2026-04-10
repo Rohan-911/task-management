@@ -1,5 +1,7 @@
 package com.task.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,19 +14,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public String handleException(Exception ex) {
-        return ex.getMessage();
-    }
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidation(
-            org.springframework.web.bind.MethodArgumentNotValidException ex) {
-
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors()
-            .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-        return errors;
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleException(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return error;
     }
 }
