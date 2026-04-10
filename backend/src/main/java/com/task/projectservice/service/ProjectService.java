@@ -8,6 +8,8 @@ import com.task.projectservice.dto.ProjectRequestDto;
 import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.entity.Project;
 import com.task.projectservice.repository.ProjectRepository;
+import com.task.user.entity.User;
+import com.task.user.repository.UserRepository;
 
 @Service
 public class ProjectService {
@@ -28,7 +30,7 @@ public class ProjectService {
                 project.getStartDate(),
                 project.getEndDate(),
                 project.getUser().getUserId(),
-                project.getUser().getUserName() 
+                project.getUser().getUsername() 
                 
         );
     }
@@ -56,7 +58,7 @@ public class ProjectService {
     }
 
     public List<ProjectResponseDto> getProjectsByUserId(Integer userId) {
-        return projectRepository.findByUserUserId(userId)
+        return projectRepository.findByUser_UserId(userId)
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());

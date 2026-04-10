@@ -3,6 +3,8 @@ package com.task.projectservice.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.task.user.entity.User;
+
 @Entity
 @Table(name = "Project")
 public class Project {

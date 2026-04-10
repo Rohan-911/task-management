@@ -23,34 +23,29 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> addProject(@Valid @RequestBody ProjectRequestDto dto) {
-        return new ResponseEntity<>(projectService.addProject(dto), HttpStatus.CREATED);
+    public ProjectResponseDto addProject(@Valid @RequestBody ProjectRequestDto dto) {
+        return projectService.addProject(dto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Integer id) {
-        return ResponseEntity.ok(projectService.getProjectById(id));
+    public ProjectResponseDto getProjectById(@PathVariable Integer id) {
+        return projectService.getProjectById(id);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProjectResponseDto>> getProjectsByUserId(@PathVariable Integer userId) {
-        return ResponseEntity.ok(projectService.getProjectsByUserId(userId));
+    public List<ProjectResponseDto> getProjectsByUserId(@PathVariable Integer userId) {
+        return projectService.getProjectsByUserId(userId);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
-        return ResponseEntity.ok(projectService.getAllProjects());
+    public List<ProjectResponseDto> getAllProjects() {
+        return projectService.getAllProjects();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Integer id,
-                                                            @Valid @RequestBody ProjectRequestDto dto) {
-        return ResponseEntity.ok(projectService.updateProject(id, dto));
+    public ProjectResponseDto updateProject(@PathVariable Integer id,
+                                            @Valid @RequestBody ProjectRequestDto dto) {
+        return projectService.updateProject(id, dto);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProject(@PathVariable Integer id) {
-        projectService.deleteProject(id);
-        return ResponseEntity.ok("Project deleted successfully");
-    }
+    
 }
