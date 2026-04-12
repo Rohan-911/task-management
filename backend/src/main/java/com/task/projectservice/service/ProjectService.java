@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.task.exception.ResourceNotFoundException;
 import com.task.projectservice.dto.ProjectRequestDto;
 import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.entity.Project;
@@ -36,6 +37,11 @@ public class ProjectService {
     }
 
     public ProjectResponseDto addProject(ProjectRequestDto dto) {
+
+        if (projectRepository.existsById(dto.getProjectId())) {
+            throw new RuntimeException("Project ID already exists");
+        }
+
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -47,10 +53,14 @@ public class ProjectService {
         project.setEndDate(dto.getEndDate());
         project.setUser(user);
 
-        return mapToDto(projectRepository.save(project));
+        try {
+            return mapToDto(projectRepository.save(project));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("Project ID already exists");
+        }
     }
 
-    public ProjectResponseDto getProjectById(Integer projectId) {
+    public ProjectResponseDto getProjectById(Integer projectId) {    	
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
@@ -88,10 +98,9 @@ public class ProjectService {
     }
 
     public void deleteProject(Integer projectId) {
-        if (!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project not found");
-        }
-        projectRepository.deleteById(projectId);
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        projectRepository.delete(project);
     }
-}
 }

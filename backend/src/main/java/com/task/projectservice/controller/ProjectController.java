@@ -23,29 +23,36 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ProjectResponseDto addProject(@Valid @RequestBody ProjectRequestDto dto) {
-        return projectService.addProject(dto);
+    public ResponseEntity<ProjectResponseDto> addProject(@Valid @RequestBody ProjectRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(projectService.addProject(dto));
     }
 
     @GetMapping("/{id}")
-    public ProjectResponseDto getProjectById(@PathVariable Integer id) {
-        return projectService.getProjectById(id);
+    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Integer id) {
+        return ResponseEntity.ok(projectService.getProjectById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public List<ProjectResponseDto> getProjectsByUserId(@PathVariable Integer userId) {
-        return projectService.getProjectsByUserId(userId);
+    public ResponseEntity<List<ProjectResponseDto>> getProjectsByUserId(@PathVariable Integer userId) {
+        return ResponseEntity.ok(projectService.getProjectsByUserId(userId));
     }
 
     @GetMapping
-    public List<ProjectResponseDto> getAllProjects() {
-        return projectService.getAllProjects();
+    public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects());
     }
 
     @PutMapping("/{id}")
-    public ProjectResponseDto updateProject(@PathVariable Integer id,
-                                            @Valid @RequestBody ProjectRequestDto dto) {
-        return projectService.updateProject(id, dto);
+    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Integer id,
+                                                            @Valid @RequestBody ProjectRequestDto dto) {
+        return ResponseEntity.ok(projectService.updateProject(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Integer id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
     }
     
 }
