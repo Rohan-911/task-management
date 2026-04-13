@@ -21,7 +21,7 @@ public class UserRole {
 	@Column(name = "RoleName")
 	private String roleName;
 	@OneToMany(mappedBy = "role")
-	@JsonIgnore // 🔥 BREAKS SECOND LOOP
+	@JsonIgnore 
 	private List<UserRoles> userRoles;
 
 	// Getters & Setters

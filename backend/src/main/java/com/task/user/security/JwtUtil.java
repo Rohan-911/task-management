@@ -12,10 +12,9 @@ import java.util.List;
 @Component
 public class JwtUtil {
 
-    // 🔐 Secret key (must be at least 32 chars)
     private final Key key = Keys.hmacShaKeyFor("secretkeysecretkeysecretkey123456".getBytes());
 
-    // ✅ Generate Token
+   
     public String generateToken(String username, List<String> roles) {
 
         return Jwts.builder()
@@ -27,19 +26,19 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ✅ Extract Username
+    
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
     }
 
-    // ✅ Validate Token
+    
     public boolean validateToken(String token) {
         return getClaims(token).getExpiration().after(new Date());
     }
 
-    // ✅ Extract Claims (FIXED METHOD)
+    
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()   // 🔥 FIXED HERE
+        return Jwts.parserBuilder()   
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
