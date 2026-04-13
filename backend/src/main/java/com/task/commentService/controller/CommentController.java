@@ -24,15 +24,29 @@ public class CommentController {
     public Comment add(@RequestBody Comment c) {
         return service.save(c);
     }
-
-    @GetMapping("/task/{id}")
-    public List<Comment> get(@PathVariable Integer id) {
-        return service.getByTask(id);
-    }
     //get all comment 
     @GetMapping 
     public List<Comment> getAll() {
     return service.getAll();
+    }
+
+    // GET BY ID
+    @GetMapping("/{id}")
+    public Comment getById(@PathVariable Integer id) {
+        return service.getById(id);
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Integer id) {
+        service.delete(id);
+        return "Comment deleted successfully";
+    }
+    
+    //GET BY TASK
+    @GetMapping("/task/{id}")
+    public List<Comment> get(@PathVariable Integer id) {
+        return service.getByTask(id);
     }
     
 }
