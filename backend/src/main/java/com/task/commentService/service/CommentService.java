@@ -23,4 +23,9 @@ public class CommentService {
     public List<Comment> getByTask(Integer taskId) {
         return repo.findByTask_TaskID(taskId);
     }
+    
+    public List<Comment> getAll() {
+    return repo.findAll();
+    }
+    
 }
