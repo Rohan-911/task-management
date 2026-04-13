@@ -9,16 +9,14 @@ import jakarta.validation.constraints.NotBlank;
 public class Category {
 
 	    @Id
-	    
 	    @Column(name = "CategoryID")
-	    private Integer categoryId;   // ✅ FIXED (was Long)
-
+	    private Integer categoryId;   
 	    @NotBlank(message = "Category name cannot be empty")
 	    @Column(name = "CategoryName")
 	    private String categoryName;
 	    
 
-	    // Getters & Setters
+	   
 	    public Integer getCategoryId() {
 	        return categoryId;
 	    }

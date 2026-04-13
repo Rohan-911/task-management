@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
-@Table(name = "Notification") // 👈 match table name exactly
+@Table(name = "Notification") //  match table name exactly
 public class Notification {
 
-    public Long getNotificationId() {
+    public int getNotificationId() {
 		return notificationId;
 	}
 
-	public void setNotificationId(Long notificationId) {
+	public void setNotificationId(int notificationId) {
 		this.notificationId = notificationId;
 	}
 
@@ -34,21 +34,21 @@ public class Notification {
 		this.createdAt = createdAt;
 	}
 
-	public Long getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NotificationID")  // ✅ exact DB column
-    private Long notificationId;
+    
+    @Column(name = "NotificationID")  
+    private int notificationId;
 
     @NotBlank(message = "Text cannot be empty")
-    @Column(name = "Text")  // ✅ exact DB column
+    @Column(name = "Text")  
     private String text;
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -56,8 +56,8 @@ public class Notification {
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
 
-    @Column(name = "UserID")  // ✅ exact DB column
-    private Long userId;
+    @Column(name = "UserID")  
+    private int userId;
 
     @PrePersist
     public void onCreate() {
