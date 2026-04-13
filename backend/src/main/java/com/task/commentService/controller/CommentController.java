@@ -29,4 +29,10 @@ public class CommentController {
     public List<Comment> get(@PathVariable Integer id) {
         return service.getByTask(id);
     }
+    //get all comment 
+    @GetMapping 
+    public List<Comment> getAll() {
+    return service.getAll();
+    }
+    
 }
