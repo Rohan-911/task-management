@@ -1,11 +1,13 @@
 package com.task.taskservice.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.task.taskservice.entity.Task;
+import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.taskservice.repository.TaskRepository;
 
 @Service
@@ -23,19 +25,71 @@ public class TaskService {
     }
 
     public Task getTaskById(Integer id) {
-        return repo.findById(id).orElse(null);
+        return repo.findById(id)
+        		.orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
     }
 
+   
+
+    public Task updateTask(Integer id, Task updatedTask) {
+        Task task = repo.findById(id)
+        		.orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+
+
+            task.setTaskName(updatedTask.getTaskName());
+            task.setDescription(updatedTask.getDescription());
+            task.setStatus(updatedTask.getStatus());
+            task.setPriority(updatedTask.getPriority());
+            task.setDueDate(updatedTask.getDueDate());
+            task.setUserID(updatedTask.getUserID());
+            task.setProjectID(updatedTask.getProjectID());
+            
+
+            return repo.save(task);
+        }
+
+        
+
+    
+    public void deleteTask(Integer id) {
+        repo.deleteById(id);
+    }
+
+    public List<Task> getTasksByPriority(String priority) {
+        return repo.findByPriority(priority);
+    }
+
+    
+    public List<Task> getTasksByStatus(String status) {
+        return repo.findByStatus(status);
+    }
+
+   
     public List<Task> getTasksByUser(Integer userId) {
         return repo.findByUserID(userId);
     }
 
-    public Task updateTask(Integer id, Task task) {
-        task.setTaskID(id);
-        return repo.save(task);
+    
+    public List<Task> getTasksByProject(Integer projectId) {
+        return repo.findByProjectID(projectId);
     }
 
-    public void deleteTask(Integer id) {
-        repo.deleteById(id);
+    
+    
+
+    
+    public List<Task> searchTasks(String name) {
+        return repo.findByTaskNameContaining(name);
+    }
+
+    
+    public List<Task> getTasksByStatusAndPriority(String status, String priority) {
+        return repo.findByStatusAndPriority(status, priority);
+    }
+
+   
+    public long countTasksByStatus(String status) {
+        return repo.countByStatus(status);
     }
 }
+    

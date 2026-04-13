@@ -4,14 +4,11 @@ import com.task.category.entity.Notification;
 import com.task.category.repository.NotificationRepository;
 
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 public class NotificationService {
-	private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationRepository repo;
 
@@ -19,16 +16,57 @@ public class NotificationService {
         this.repo = repo;
     }
 
+    
     public Notification createNotification(Notification notification) {
-    	logger.info("Notification received: {}", notification.getText());
 
-        Notification saved = repo.save(notification);
+        
+        Integer nextId = repo.findMaxId() == null ? 1 : repo.findMaxId() + 1;
 
-        return saved;
+        notification.setNotificationId(nextId);
+
+        return repo.save(notification);
     }
 
+    
     public List<Notification> getAllNotifications() {
         return repo.findAll();
     }
+
+   
+    public Notification getNotificationById(Integer id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+    }
+
     
+    public Notification updateNotification(Integer id, Notification updated) {
+
+        Notification existing = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+
+        existing.setText(updated.getText());
+        existing.setUserId(updated.getUserId());
+
+        return repo.save(existing);
+    }
+
+    
+    public void deleteNotification(Integer id) {
+        repo.deleteById(id);
+    }
+
+    
+    public List<Notification> getNotificationsByUserId(Integer userId) {
+        return repo.findByUserId(userId);
+    }
+
+    
+    public List<Notification> searchByText(String text) {
+        return repo.findByTextContaining(text);
+    }
+
+    
+    public List<Notification> getLatestNotifications() {
+        return repo.findTop5ByOrderByCreatedAtDesc();
+    }
 }
