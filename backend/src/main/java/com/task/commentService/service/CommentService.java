@@ -14,16 +14,29 @@ public class CommentService {
 
     @Autowired
     private CommentRepository repo;
-
+    
+    // CREATE
     public Comment save(Comment c) {
         c.setCreatedAt(LocalDateTime.now());
         return repo.save(c);
     }
-
+    
+    // GET BY ID
+    public Comment getById(Integer id) {
+        return repo.findById(id).orElse(null);
+    }
+    
+    // DELETE
+    public void delete(Integer id) {
+        repo.deleteById(id);
+    }
+    
+    // GET BY TASK
     public List<Comment> getByTask(Integer taskId) {
         return repo.findByTask_TaskID(taskId);
     }
     
+    // GET ALL
     public List<Comment> getAll() {
     return repo.findAll();
     }
