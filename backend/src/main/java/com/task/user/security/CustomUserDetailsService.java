@@ -13,27 +13,23 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) {
+	@Override
+	public UserDetails loadUserByUsername(String username) {
+		User user = userRepository.findByUsernameWithRoles(username)
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ VERY IMPORTANT (use WITH ROLES)
-        User user = userRepository.findByUsernameWithRoles(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		List<SimpleGrantedAuthority> authorities = (user.getUserRoles() != null && !user.getUserRoles().isEmpty())
+				? user.getUserRoles().stream().filter(ur -> ur.getRole() != null).map(ur -> ur.getRole().getRoleName())
+						.map(role -> "ROLE_" + role.toUpperCase()).map(SimpleGrantedAuthority::new).toList()
+				: List.of();
 
-        List<SimpleGrantedAuthority> authorities =
-                user.getUserRoles().stream()
-                        .map(ur -> ur.getRole().getRoleName())
-                        .map(role -> "ROLE_" + role.toUpperCase())
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
+		System.out.println("AUTH USER: " + username);
+		System.out.println("AUTHORITIES: " + authorities);
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                authorities
-        );
-    }
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+				authorities);
+	}
 }

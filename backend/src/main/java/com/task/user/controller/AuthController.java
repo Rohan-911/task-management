@@ -19,7 +19,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // ✅ LOGIN API
+ 
     @PostMapping("/login")
     public AuthResponseDTO login(@RequestBody LoginRequestDTO dto) {
         return authService.login(dto);
