@@ -14,18 +14,19 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableMethodSecurity
-public class SecurityConfig {
+public class UserSecurityConfig {
 
     private final JwtFilter jwtFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public UserSecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain usersecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
+        .securityMatcher("/api/users/**") 
             .csrf(csrf -> csrf.disable())
 
          
