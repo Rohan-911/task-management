@@ -26,19 +26,23 @@ public class CommentService {
         return repo.findById(id).orElse(null);
     }
     
+    // GET ALL
+    public List<Comment> getAll() {
+    return repo.findAll();
+    }
+    
     // DELETE
     public void delete(Integer id) {
         repo.deleteById(id);
     }
     
     // GET BY TASK
-    public List<Comment> getByTask(Integer taskId) {
-        return repo.findByTask_TaskID(taskId);
+    public List<Comment> getByTaskId(Integer taskId) {
+    return repo.findByTask_TaskID(taskId);
     }
-    
-    // GET ALL
-    public List<Comment> getAll() {
-    return repo.findAll();
+
+    // GET USER BY ID 
+    public List<Comment> getByUser(Integer userId) {
+    return repo.findByUserID(userId);
     }
-    
 }
