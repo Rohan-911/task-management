@@ -24,7 +24,7 @@ public class CommentController {
     public Comment add(@RequestBody Comment c) {
         return service.save(c);
     }
-    //get all comment 
+    //GET ALL COMMENT
     @GetMapping 
     public List<Comment> getAll() {
     return service.getAll();
@@ -44,9 +44,14 @@ public class CommentController {
     }
     
     //GET BY TASK
-    @GetMapping("/task/{id}")
-    public List<Comment> get(@PathVariable Integer id) {
-        return service.getByTask(id);
+    @GetMapping("/task/{taskId}")
+    public List<Comment> getByTask(@PathVariable Integer taskId) {
+    return service.getByTaskId(taskId);
     }
     
+    //GET BY USER
+    @GetMapping("/user/{userId}")
+    public List<Comment> getByUser(@PathVariable Integer userId) {
+    return service.getByUser(userId);
+    }
 }
