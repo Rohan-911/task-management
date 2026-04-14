@@ -4,11 +4,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.task.exception.ResourceNotFoundException;
+
 import com.task.projectservice.dto.ProjectRequestDto;
 import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.entity.Project;
 import com.task.projectservice.repository.ProjectRepository;
+import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.user.dto.UserResponseDTO;
 import com.task.user.entity.User;
 import com.task.user.repository.UserRepository;
@@ -64,15 +65,15 @@ public class ProjectService {
     }
 
     public List<ProjectResponseDto> getProjectsByUserId(Integer userId) {
-    	 if (!userRepository.existsById(userId)) {
-    	        throw new ResourceNotFoundException("User not found with ID: " + userId);
-    	    }
+   	 if (!userRepository.existsById(userId)) {
+   	        throw new ResourceNotFoundException("User not found with ID: " + userId);
+   	    }
 
-        return projectRepository.findByUser_UserId(userId)
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-    }
+       return projectRepository.findByUser_UserId(userId)
+               .stream()
+               .map(this::mapToDto)
+               .collect(Collectors.toList());
+   }
 
     public List<ProjectResponseDto> getAllProjects() {
         return projectRepository.findAll()
@@ -159,5 +160,6 @@ public class ProjectService {
     public long countProjectsByUser(Integer userId) {
         return projectRepository.countByUser_UserId(userId);
     }
+
 
 }

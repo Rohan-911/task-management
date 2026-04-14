@@ -23,14 +23,14 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
-	    @PostMapping("/users/{userId}/projects")
-	    public ResponseEntity<ProjectResponseDto> createProjectForUser(
-	            @PathVariable Integer userId,
-	            @Valid @RequestBody ProjectRequestDto dto) {
-	
-	        return ResponseEntity.status(HttpStatus.CREATED)
-	                .body(projectService.createProjectForUser(userId, dto));
-	    }
+    @PostMapping("/users/{userId}/projects")
+    public ResponseEntity<ProjectResponseDto> createProjectForUser(
+            @PathVariable Integer userId,
+            @Valid @RequestBody ProjectRequestDto dto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(projectService.createProjectForUser(userId, dto));
+    }
 
     @GetMapping("/projects/{projectId}")
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Integer projectId) {

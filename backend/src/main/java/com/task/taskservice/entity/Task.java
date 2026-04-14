@@ -1,9 +1,13 @@
 package com.task.taskservice.entity;
 
 import java.util.Date;
+import java.util.List;
+
+import com.task.category.entity.Category;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Task")
@@ -12,7 +16,7 @@ public class Task {
     @Id
     private Integer taskID;
 
-    @NotBlank
+    @NotBlank(message ="Task name is required")
     private String taskName;
 
     private String description;
@@ -22,9 +26,14 @@ public class Task {
 
     private String priority;
     private String status;
-
+    
+    @NotNull(message = "Project ID is required")
     private Integer projectID;
+    
+    @NotNull(message = "User ID is required")
     private Integer userID;
+    
+   
 	public Integer getTaskID() {
 		return taskID;
 	}
@@ -74,5 +83,4 @@ public class Task {
 		this.userID = userID;
 	}
 
-    // getters and setters
 }
