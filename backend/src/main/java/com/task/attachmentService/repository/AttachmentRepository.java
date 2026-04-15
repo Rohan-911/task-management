@@ -6,9 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 
 import com.task.attachmentService.entitiy.Attachment;
+import java.util.List;
 
 public interface AttachmentRepository extends JpaRepository<Attachment, Integer> {
-	List<Attachment> findByTask_TaskID(Integer taskID);
-	@Modifying
-	void deleteByTask_TaskID(Integer taskID);
+   List<Attachment> findByTask_TaskID(Integer taskID);
 }
