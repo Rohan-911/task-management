@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.task.exception.DuplicateResourceException;
 import com.task.exception.ResourceNotFoundException;
 import com.task.projectservice.dto.ProjectRequestDto;
 import com.task.projectservice.dto.ProjectResponseDto;
@@ -22,7 +23,7 @@ import com.task.projectservice.entity.Project;
 import com.task.projectservice.repository.ProjectRepository;
 
 import com.task.user.entity.User;
-import com.task.user.exception.DuplicateResourceException;
+
 import com.task.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
