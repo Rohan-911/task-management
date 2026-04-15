@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
-    // ================= CATEGORY =================
 
     @Mock
     private CategoryRepository categoryRepo;
@@ -31,7 +30,6 @@ class CategoryServiceTest {
     @InjectMocks
     private CategoryService categoryService;
 
-    // ================= NOTIFICATION =================
 
     @Mock
     private NotificationRepository notificationRepo;
@@ -39,9 +37,6 @@ class CategoryServiceTest {
     @InjectMocks
     private NotificationService notificationService;
 
-    // =====================================================
-    // 🔹 CATEGORY TESTS
-    // =====================================================
 
     @Test
     void testCreateCategory() {
@@ -154,9 +149,7 @@ class CategoryServiceTest {
         assertEquals(1, categoryService.getCategoriesByTaskId(1).size());
     }
 
-    // =====================================================
-    // 🔹 NOTIFICATION TESTS
-    // =====================================================
+ 
 
     @Test
     void testCreateNotification() {

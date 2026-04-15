@@ -16,8 +16,6 @@ public class CategoryController {
     public CategoryController(CategoryService service) {
         this.service = service;
     }
-
-
     
     @PostMapping("/create")
     public Category createCategory(@Valid @RequestBody Category category) {
