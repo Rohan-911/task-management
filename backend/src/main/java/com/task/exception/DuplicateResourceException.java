@@ -1,4 +1,4 @@
-package com.task.user.exception;
+package com.task.exception;
 
 public class DuplicateResourceException extends RuntimeException {
 

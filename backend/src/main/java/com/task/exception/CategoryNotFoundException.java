@@ -1,4 +1,4 @@
-package com.task.category.exception;
+package com.task.exception;
 
 
 

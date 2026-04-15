@@ -5,8 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
+import com.task.exception.ResourceNotFoundException;
 import com.task.taskservice.entity.Task;
-import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.taskservice.repository.TaskRepository;
 
 import org.junit.jupiter.api.BeforeEach;

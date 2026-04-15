@@ -5,15 +5,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.task.exception.BadRequestException;
+import com.task.exception.DuplicateResourceException;
+import com.task.exception.ResourceNotFoundException;
 import com.task.user.dto.UserRequestDTO;
 import com.task.user.dto.UserResponseDTO;
 import com.task.user.entity.User;
 import com.task.user.entity.UserRole;
 import com.task.user.entity.UserRoles;
 import com.task.user.entity.UserRolesId;
-import com.task.user.exception.BadRequestException;
-import com.task.user.exception.DuplicateResourceException;
-import com.task.user.exception.ResourceNotFoundException;
 import com.task.user.repository.UserRepository;
 import com.task.user.repository.UserRoleRepository;
 import com.task.user.repository.UserRolesRepository;

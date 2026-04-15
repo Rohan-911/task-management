@@ -2,8 +2,8 @@ package com.task.category.service;
 
 import com.task.category.entity.Category;
 import com.task.category.repository.CategoryRepository;
-import com.task.category.exception.CategoryNotFoundException;
-import com.task.category.exception.BadRequestException;
+import com.task.exception.BadRequestException;
+import com.task.exception.CategoryNotFoundException;
 
 import org.springframework.stereotype.Service;
 
