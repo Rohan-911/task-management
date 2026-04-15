@@ -67,9 +67,9 @@ class CommentServiceTest {
     // TEST GET BY TASK
     @Test
     void testGetByTask() {
-        when(repo.findByTaskID(1)).thenReturn(Arrays.asList(new Comment()));
+        when(repo.findByTask_TaskID(1)).thenReturn(Arrays.asList(new Comment()));
 
-        List<Comment> list = service.getByTask(1);
+        List<Comment> list = service.getByTaskId(1);
 
         assertEquals(1, list.size());
     }
@@ -105,9 +105,9 @@ class CommentServiceTest {
     
     @Test
     void testGetByTask_Empty() {
-        when(repo.findByTaskID(1)).thenReturn(Collections.emptyList());
+        when(repo.findByTask_TaskID(1)).thenReturn(Collections.emptyList());
 
-        List<Comment> list = service.getByTask(1);
+        List<Comment> list = service.getByTaskId(1);
 
         assertTrue(list.isEmpty());
     }

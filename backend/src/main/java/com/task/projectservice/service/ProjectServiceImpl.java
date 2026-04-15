@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 
 import com.task.category.entity.Notification;
 import com.task.category.service.NotificationService;
+import com.task.exception.DuplicateResourceException;
+import com.task.exception.ResourceNotFoundException;
 import com.task.projectservice.dto.ProjectRequestDto;
 import com.task.projectservice.dto.ProjectResponseDto;
 import com.task.projectservice.entity.Project;
 import com.task.projectservice.repository.ProjectRepository;
-import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.user.dto.UserResponseDTO;
 import com.task.user.entity.User;
-import com.task.user.exception.DuplicateResourceException;
 import com.task.user.repository.UserRepository;
 
 @Service

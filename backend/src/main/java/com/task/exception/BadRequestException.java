@@ -1,5 +1,4 @@
-package com.task.category.exception;
-
+package com.task.exception;
 
 public class BadRequestException extends RuntimeException {
 
