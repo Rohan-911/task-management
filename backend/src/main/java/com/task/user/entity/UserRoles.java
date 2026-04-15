@@ -21,7 +21,7 @@ public class UserRoles {
 	@ManyToOne
 	@MapsId("userId")
 	@JoinColumn(name = "UserID")
-	@JsonBackReference // 🔥 THIS BREAKS LOOP
+	@JsonBackReference
 	@JsonIgnore
 	private User user;
 

@@ -11,21 +11,25 @@ import com.task.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-	// ✅ Get user with roles (for login / profile)
 	@Query("SELECT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role WHERE u.username = :username")
 	Optional<User> findByUsernameWithRoles(@Param("username") String username);
 
-	// ✅ Get ALL users with roles (FIXED MAIN ISSUE)
 	@Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role")
 	List<User> findAllUsersWithRoles();
 
-	// ✅ Get user by ID with roles
 	@Query("SELECT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role WHERE u.userId = :id")
 	Optional<User> findByIdWithRoles(@Param("id") Integer id);
 
-	// ✅ Check username exists
 	boolean existsByUsername(String username);
 
-	// ✅ Search users
+	@Query("""
+			    SELECT DISTINCT u
+			    FROM User u
+			    JOIN u.userRoles ur
+			    JOIN ur.role r
+			    WHERE LOWER(r.roleName) = LOWER(:roleName)
+			""")
+	List<User> findUsersByRole(@Param("roleName") String roleName);
+
 	List<User> findByUsernameContainingIgnoreCase(String username);
 }

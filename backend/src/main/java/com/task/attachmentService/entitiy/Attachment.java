@@ -1,6 +1,8 @@
 package com.task.attachmentService.entitiy;
 
-import org.springframework.scheduling.config.Task;
+
+
+import com.task.taskservice.entity.Task;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,4 +21,38 @@ public class Attachment {
     @ManyToOne
     @JoinColumn(name = "taskID")
     private Task task;
+
+	public Integer getAttachmentID() {
+		return attachmentID;
+	}
+
+	public void setAttachmentID(Integer attachmentID) {
+		this.attachmentID = attachmentID;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
+	}
+    
+    
 }

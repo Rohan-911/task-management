@@ -20,7 +20,6 @@ public class ProjectRequestDto {
 
     private LocalDate endDate;
 
-    @NotNull
     private Integer userId;
 
 	public Integer getProjectId() {

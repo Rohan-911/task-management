@@ -20,7 +20,7 @@ public class Comment {
     @Column(name = "createdAt")
     private Date createdAt;
 
-    // Foreign Keys (simple approach)
+   
     @Column(name = "taskID")
     private Integer taskID;
 

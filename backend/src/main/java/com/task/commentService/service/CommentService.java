@@ -1,6 +1,7 @@
 package com.task.commentService.service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class CommentService {
     
     // CREATE
     public Comment save(Comment c) {
-        c.setCreatedAt(LocalDateTime.now());
+        c.setCreatedAt(new Date());
         return repo.save(c);
     }
     

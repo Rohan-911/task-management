@@ -16,15 +16,13 @@ public class UserRolesId implements Serializable {
         this.userRoleId = userRoleId;
     }
 
-    // Getters & Setters
-
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
 
     public Integer getUserRoleId() { return userRoleId; }
     public void setUserRoleId(Integer userRoleId) { this.userRoleId = userRoleId; }
 
-    // equals & hashCode (IMPORTANT)
+   
 
     @Override
     public boolean equals(Object o) {
