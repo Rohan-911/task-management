@@ -14,37 +14,28 @@ public class AttachmentService {
     @Autowired
     private AttachmentRepository repo;
 
-    //  CREATE
+    // CREATE
     public Attachment save(Attachment a) {
         return repo.save(a);
     }
 
-    //  GET ALL
+    // GET ALL
     public List<Attachment> getAll() {
         return repo.findAll();
     }
 
-    //  GET BY ID
+    // GET BY ID
     public Attachment getById(Integer id) {
         return repo.findById(id).orElse(null);
     }
 
-    //  DELETE
+    // DELETE
     public void delete(Integer id) {
         repo.deleteById(id);
     }
 
-    // GET BY TASK ID 
+    // GET BY TASK ID
     public List<Attachment> getByTaskId(Integer taskId) {
         return repo.findByTask_TaskID(taskId);
-    }
-    
-    //count by task
-    public int countByTask(Integer taskId) {
-        return repo.findByTask_TaskID(taskId).size();
-    }
-    //delete all attachment of  task
-    public void deleteByTask(Integer taskId) {
-        repo.deleteByTask_TaskID(taskId);
     }
 }
