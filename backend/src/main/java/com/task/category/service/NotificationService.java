@@ -20,11 +20,16 @@ public class NotificationService {
     public Notification createNotification(Notification notification) {
 
         
-        Integer nextId = repo.findMaxId() == null ? 1 : repo.findMaxId() + 1;
+    	Integer nextId = repo.findMaxId() == null ? 1 : repo.findMaxId() + 1;
 
         notification.setNotificationId(nextId);
 
-        return repo.save(notification);
+        Notification saved = repo.save(notification);
+
+        System.out.println(" Notification Created: " + saved.getText() 
+            + " | UserID: " + saved.getUserId());
+
+        return saved;
     }
 
     
@@ -41,18 +46,29 @@ public class NotificationService {
     
     public Notification updateNotification(Integer id, Notification updated) {
 
-        Notification existing = repo.findById(id)
+    	Notification existing = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
 
         existing.setText(updated.getText());
         existing.setUserId(updated.getUserId());
 
-        return repo.save(existing);
+        Notification saved = repo.save(existing);
+
+        System.out.println(" Notification Updated: " + saved.getText() 
+            + " | ID: " + id);
+
+        return saved;
     }
 
     
     public void deleteNotification(Integer id) {
-        repo.deleteById(id);
+    	Notification existing = repo.findById(id)
+    	        .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+    	    repo.deleteById(id);
+
+    	    System.out.println(" Notification Deleted: " + existing.getText() 
+    	        + " | ID: " + id);
     }
 
     
