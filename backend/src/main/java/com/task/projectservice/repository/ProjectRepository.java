@@ -8,5 +8,6 @@ import com.task.projectservice.entity.Project;
 
 public interface ProjectRepository extends JpaRepository<Project, Integer>{
 	public List<Project> findByUser_UserId(Integer userId);
-	long countByUser_UserId(Integer userId);
+	public long countByUser_UserId(Integer userId);
+	public List<Project> findByUserIsNull();
 }

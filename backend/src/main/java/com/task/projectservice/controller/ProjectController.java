@@ -51,16 +51,32 @@ public class ProjectController {
     public ResponseEntity<UserResponseDTO> getUserOfProject(@PathVariable Integer projectId) {
         return ResponseEntity.ok(projectService.getUserOfProject(projectId));
     }
-
+    
     @PutMapping("/projects/{projectId}")
     public ResponseEntity<ProjectResponseDto> updateProject(
             @PathVariable Integer projectId,
             @Valid @RequestBody ProjectRequestDto dto) {
 
-        return ResponseEntity.ok(projectService.updateProject(projectId, dto));
+        ProjectResponseDto updatedProject = projectService.updateProject(projectId, dto);
+        return ResponseEntity.ok(updatedProject);
     }
 
-    @PutMapping("/projects/{projectId}/user/{userId}")
+    @PatchMapping("/projects/{projectId}")
+    public ResponseEntity<ProjectResponseDto> patchProject(
+            @PathVariable Integer projectId,
+            @RequestBody ProjectRequestDto dto) {
+
+        return ResponseEntity.ok(projectService.patchProject(projectId, dto));
+    }
+    
+    @PatchMapping("/projects/{projectId}/user/remove")
+    public ResponseEntity<ProjectResponseDto> removeUserFromProject(
+            @PathVariable Integer projectId) {
+
+        return ResponseEntity.ok(projectService.removeUserFromProject(projectId));
+    }
+
+    @PatchMapping("/projects/{projectId}/user/{userId}")
     public ResponseEntity<ProjectResponseDto> changeProjectUser(
             @PathVariable Integer projectId,
             @PathVariable Integer userId) {
@@ -82,6 +98,16 @@ public class ProjectController {
     @GetMapping("/users/{userId}/projects/count")
     public ResponseEntity<Long> countProjectsByUser(@PathVariable Integer userId) {
         return ResponseEntity.ok(projectService.countProjectsByUser(userId));
+    }
+    
+    @GetMapping("/projects/unassigned")
+    public ResponseEntity<List<ProjectResponseDto>> getUnassignedProjects() {
+        return ResponseEntity.ok(projectService.getUnassignedProjects());
+    }
+    
+    @GetMapping("/users/{userId}/projects/latest")
+    public ResponseEntity<ProjectResponseDto> getLatestProject(@PathVariable Integer userId) {
+        return ResponseEntity.ok(projectService.getLatestProject(userId));
     }
 
    
