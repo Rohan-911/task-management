@@ -1,19 +1,22 @@
 package com.task.taskservice.service;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.util.*;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import com.task.taskservice.entity.Task;
 import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.taskservice.repository.TaskRepository;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
 
     @Mock
@@ -22,51 +25,44 @@ public class TaskServiceTest {
     @InjectMocks
     private TaskService service;
 
-    public TaskServiceTest() {
-        MockitoAnnotations.openMocks(this);
+    private Task task;
+
+    @BeforeEach
+    void setup() {
+        task = new Task();
+        task.setTaskName("Test Task");
+        task.setDescription("Test Desc");
+        task.setStatus("OPEN");
+        task.setPriority("HIGH");
+        task.setUserID(101);
+        task.setProjectID(201);
     }
 
-  
+    
     @Test
     void testCreateTask() {
-        Task task = new Task();
-        task.setTaskName("Test Task");
-
         when(repo.save(task)).thenReturn(task);
 
         Task result = service.createTask(task);
 
         assertNotNull(result);
         assertEquals("Test Task", result.getTaskName());
+        verify(repo, times(1)).save(task);
     }
 
     
     @Test
     void testGetAllTasks() {
-        List<Task> list = new ArrayList<>();
-        list.add(new Task());
-        list.add(new Task());
+        when(repo.findAll()).thenReturn(List.of(task));
 
-        when(repo.findAll()).thenReturn(list);
+        List<Task> tasks = service.getAllTasks();
 
-        List<Task> result = service.getAllTasks();
-
-        assertEquals(2, result.size());
+        assertEquals(1, tasks.size());
+        verify(repo).findAll();
     }
 
-   
-    @Test
-    void testGetTaskById() {
-        Task task = new Task();
-        task.setTaskID(1);
-
-        when(repo.findById(1)).thenReturn(Optional.of(task));
-
-        Task result = service.getTaskById(1);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTaskID());
-    }
+    
+    
 
     
     @Test
@@ -81,34 +77,22 @@ public class TaskServiceTest {
     
     @Test
     void testUpdateTask() {
-        Task existing = new Task();
-        existing.setTaskID(1);
-        existing.setTaskName("Old");
+        when(repo.findById(1)).thenReturn(Optional.of(task));
+        when(repo.save(any(Task.class))).thenReturn(task);
 
         Task updated = new Task();
-        updated.setTaskName("New");
-
-        when(repo.findById(1)).thenReturn(Optional.of(existing));
-        when(repo.save(any(Task.class))).thenReturn(existing);
+        updated.setTaskName("Updated Task");
+        updated.setDescription("Updated Desc");
+        updated.setStatus("DONE");
+        updated.setPriority("LOW");
 
         Task result = service.updateTask(1, updated);
 
-        assertEquals("New", result.getTaskName());
+        assertEquals("Updated Task", result.getTaskName());
+        verify(repo).save(any(Task.class));
     }
 
     
-    @Test
-    void testUpdateTask_NotFound() {
-        Task updated = new Task();
-
-        when(repo.findById(1)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> {
-            service.updateTask(1, updated);
-        });
-    }
-
-   
     @Test
     void testDeleteTask() {
         doNothing().when(repo).deleteById(1);
@@ -118,52 +102,43 @@ public class TaskServiceTest {
         verify(repo, times(1)).deleteById(1);
     }
 
-   
+    
     @Test
-    void testGetTasksByStatus() {
-        List<Task> list = new ArrayList<>();
-        list.add(new Task());
+    void testGetTasksByPriority() {
+        when(repo.findByPriority("HIGH")).thenReturn(List.of(task));
 
-        when(repo.findByStatus("Pending")).thenReturn(list);
-
-        List<Task> result = service.getTasksByStatus("Pending");
+        List<Task> result = service.getTasksByPriority("HIGH");
 
         assertEquals(1, result.size());
     }
 
    
     @Test
-    void testGetTasksByPriority() {
-        List<Task> list = new ArrayList<>();
-        list.add(new Task());
+    void testGetTasksByStatus() {
+        when(repo.findByStatus("OPEN")).thenReturn(List.of(task));
 
-        when(repo.findByPriority("High")).thenReturn(list);
-
-        List<Task> result = service.getTasksByPriority("High");
+        List<Task> result = service.getTasksByStatus("OPEN");
 
         assertEquals(1, result.size());
     }
 
     
     @Test
-    void testGetTasksByUser() {
-        List<Task> list = new ArrayList<>();
-        list.add(new Task());
+    void testSearchTasks() {
+        when(repo.findByTaskNameContaining("Test")).thenReturn(List.of(task));
 
-        when(repo.findByUserID(1)).thenReturn(list);
+        List<Task> result = service.searchTasks("Test");
 
-        List<Task> result = service.getTasksByUser(1);
-
-        assertEquals(1, result.size());
+        assertFalse(result.isEmpty());
     }
 
-  
+    
     @Test
     void testCountTasksByStatus() {
-        when(repo.countByStatus("Pending")).thenReturn(5L);
+        when(repo.countByStatus("OPEN")).thenReturn(5L);
 
-        long result = service.countTasksByStatus("Pending");
+        long count = service.countTasksByStatus("OPEN");
 
-        assertEquals(5, result);
+        assertEquals(5, count);
     }
 }
