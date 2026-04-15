@@ -31,7 +31,7 @@ public class NotificationController {
     }
 
     
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public Notification getById(@PathVariable Integer id) {
         return service.getNotificationById(id);
     }
