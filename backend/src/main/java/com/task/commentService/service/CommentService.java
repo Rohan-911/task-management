@@ -39,9 +39,9 @@ public class CommentService {
     
     // GET BY TASK
     public List<Comment> getByTaskId(Integer taskId) {
-    return repo.findByTask_TaskID(taskId);
+        return repo.findByTaskID(taskId);
     }
-
+    
     // GET USER BY ID 
     public List<Comment> getByUser(Integer userId) {
     return repo.findByUserID(userId);

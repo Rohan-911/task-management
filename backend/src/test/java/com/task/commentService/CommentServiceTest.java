@@ -67,12 +67,13 @@ class CommentServiceTest {
     // TEST GET BY TASK
     @Test
     void testGetByTask() {
-        when(repo.findByTask_TaskID(1)).thenReturn(Arrays.asList(new Comment()));
+        when(repo.findByTaskID(1)).thenReturn(Arrays.asList(new Comment())); // FIXED
 
         List<Comment> list = service.getByTaskId(1);
 
         assertEquals(1, list.size());
     }
+
 
     // TEST GET BY USER
     @Test
@@ -103,9 +104,10 @@ class CommentServiceTest {
         assertNull(result);
     }
     
+    // TEST EMPTY
     @Test
     void testGetByTask_Empty() {
-        when(repo.findByTask_TaskID(1)).thenReturn(Collections.emptyList());
+        when(repo.findByTaskID(1)).thenReturn(Collections.emptyList()); // FIXED
 
         List<Comment> list = service.getByTaskId(1);
 

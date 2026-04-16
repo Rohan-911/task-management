@@ -3,42 +3,29 @@ package com.task.commentService.entity;
 import java.util.Date;
 
 import jakarta.persistence.*;
-
 @Entity
 @Table(name = "Comment")
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "commentID")
+    @Column(name = "CommentID")
     private Integer commentID;
 
-    @Column(name = "content", nullable = false)
-    private String content;
+    @Column(name = "Text", nullable = false)
+    private String content;   // KEEP THIS NAME
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createdAt")
+    @Column(name = "CreatedAt")
     private Date createdAt;
 
-   
-    @Column(name = "taskID")
+    @Column(name = "TaskID")
     private Integer taskID;
 
-    @Column(name = "userID")
+    @Column(name = "UserID")
     private Integer userID;
 
-    // Constructors
-    public Comment() {}
+    // GETTERS & SETTERS
 
-    public Comment(Integer commentID, String content, Date createdAt, Integer taskID, Integer userID) {
-        this.commentID = commentID;
-        this.content = content;
-        this.createdAt = createdAt;
-        this.taskID = taskID;
-        this.userID = userID;
-    }
-
-    // Getters & Setters
     public Integer getCommentID() {
         return commentID;
     }

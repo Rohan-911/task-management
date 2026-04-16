@@ -34,8 +34,18 @@ public class AttachmentService {
         repo.deleteById(id);
     }
 
-    // GET BY TASK ID
+    // GET BY TASK ID (FIXED)
     public List<Attachment> getByTaskId(Integer taskId) {
         return repo.findByTask_TaskID(taskId);
+    }
+
+    // NEW: COUNT
+    public int countByTask(Integer taskId) {
+        return repo.countByTask_TaskID(taskId);
+    }
+
+    // NEW: DELETE BY TASK
+    public void deleteByTask(Integer taskId) {
+        repo.deleteByTask_TaskID(taskId);
     }
 }
