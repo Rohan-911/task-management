@@ -1,5 +1,0 @@
-package com.task.category.service;
-
-public class CaegoryControllerTest extends CategoryServiceTest {
-
-}

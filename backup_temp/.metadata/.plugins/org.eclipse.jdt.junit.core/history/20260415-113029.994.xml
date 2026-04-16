@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><testrun name="TaskServiceTest" project="backend" tests="4" started="4" failures="0" errors="0" ignored="0">
-  <testsuite name="com.task.taskservice.service.TaskServiceTest" time="0.591" displayname="TaskServiceTest" uniqueid="[engine:junit-jupiter]/[class:com.task.taskservice.service.TaskServiceTest]">
-    <testcase name="testGetAllTasks" classname="com.task.taskservice.service.TaskServiceTest" time="0.583" displayname="testGetAllTasks()" uniqueid="[engine:junit-jupiter]/[class:com.task.taskservice.service.TaskServiceTest]/[method:testGetAllTasks()]"/>
-    <testcase name="testCreateTask" classname="com.task.taskservice.service.TaskServiceTest" time="0.002" displayname="testCreateTask()" uniqueid="[engine:junit-jupiter]/[class:com.task.taskservice.service.TaskServiceTest]/[method:testCreateTask()]"/>
-    <testcase name="testGetTaskById" classname="com.task.taskservice.service.TaskServiceTest" time="0.002" displayname="testGetTaskById()" uniqueid="[engine:junit-jupiter]/[class:com.task.taskservice.service.TaskServiceTest]/[method:testGetTaskById()]"/>
-    <testcase name="testDeleteTask" classname="com.task.taskservice.service.TaskServiceTest" time="0.004" displayname="testDeleteTask()" uniqueid="[engine:junit-jupiter]/[class:com.task.taskservice.service.TaskServiceTest]/[method:testDeleteTask()]"/>
-  </testsuite>
-</testrun>
