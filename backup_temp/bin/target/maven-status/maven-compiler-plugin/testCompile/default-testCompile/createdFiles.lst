@@ -1,0 +1,7 @@
+com/task/user/service/UserServiceTest.class
+com/task/BackendApplicationTests.class
+com/task/category/service/CategoryServiceTest.class
+com/task/taskservice/service/TaskServiceTest.class
+com/task/category/controller/CategoryControllerTest.class
+com/task/user/service/AuthServiceTest.class
+com/task/taskservice/controller/TaskControllerTest.class

@@ -1,0 +1,215 @@
+package com.task.category.controller;
+
+import com.task.category.entity.Category;
+import com.task.category.entity.Notification;
+import com.task.category.service.CategoryService;
+import com.task.category.service.NotificationService;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ControllerTest {
+
+    @Mock
+    private CategoryService categoryService;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @InjectMocks
+    private CategoryController categoryController;
+
+    @InjectMocks
+    private NotificationController notificationController;
+
+
+
+    @Test
+    void testCreateCategory() {
+        Category cat = new Category();
+        cat.setCategoryId(1);
+        cat.setCategoryName("Dev");
+
+        when(categoryService.createCategory(any(Category.class))).thenReturn(cat);
+
+        Category result = categoryController.createCategory(cat);
+
+        assertNotNull(result);
+        assertEquals("Dev", result.getCategoryName());
+    }
+
+    @Test
+    void testGetAllCategories() {
+        when(categoryService.getAllCategories())
+                .thenReturn(List.of(new Category(), new Category()));
+
+        List<Category> result = categoryController.getAll();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetCategoryById() {
+        Category cat = new Category();
+        cat.setCategoryId(1);
+        cat.setCategoryName("Dev");
+
+        when(categoryService.getCategoryById(1)).thenReturn(cat);
+
+        Category result = categoryController.getById(1);
+
+        assertEquals("Dev", result.getCategoryName());
+    }
+
+    @Test
+    void testUpdateCategory() {
+        Category cat = new Category();
+        cat.setCategoryId(1);
+        cat.setCategoryName("Updated");
+
+        when(categoryService.updateCategory(eq(1), any(Category.class)))
+                .thenReturn(cat);
+
+        Category result = categoryController.updateCategory(1, cat);
+
+        assertEquals("Updated", result.getCategoryName());
+    }
+
+    @Test
+    void testDeleteCategory() {
+        doNothing().when(categoryService).deleteCategory(1);
+
+        String result = categoryController.deleteCategory(1);
+
+        assertEquals("Category deleted successfully", result);
+        verify(categoryService, times(1)).deleteCategory(1);
+    }
+
+    @Test
+    void testSearchCategory() {
+        Category cat = new Category();
+        cat.setCategoryName("Dev");
+
+        when(categoryService.searchByName("dev"))
+                .thenReturn(List.of(cat));
+
+        List<Category> result = categoryController.searchByName("dev");
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetCategoriesByTask() {
+        when(categoryService.getCategoriesByTaskId(1))
+                .thenReturn(List.of(new Category()));
+
+        List<Category> result = categoryController.getCategoriesByTask(1);
+
+        assertEquals(1, result.size());
+    }
+
+
+    @Test
+    void testCreateNotification() {
+        Notification notification = new Notification();
+        notification.setNotificationId(1);
+        notification.setText("Task Created");
+
+        when(notificationService.createNotification(any(Notification.class)))
+                .thenReturn(notification);
+
+        Notification result = notificationController.create(notification);
+
+        assertNotNull(result);
+        assertEquals("Task Created", result.getText());
+    }
+
+    @Test
+    void testGetAllNotifications() {
+        when(notificationService.getAllNotifications())
+                .thenReturn(List.of(new Notification(), new Notification()));
+
+        List<Notification> result = notificationController.getAll();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetNotificationById() {
+        Notification notification = new Notification();
+        notification.setNotificationId(1);
+        notification.setText("Test");
+
+        when(notificationService.getNotificationById(1))
+                .thenReturn(notification);
+
+        Notification result = notificationController.getById(1);
+
+        assertEquals("Test", result.getText());
+    }
+
+    @Test
+    void testUpdateNotification() {
+        Notification notification = new Notification();
+        notification.setNotificationId(1);
+        notification.setText("Updated");
+
+        when(notificationService.updateNotification(eq(1), any(Notification.class)))
+                .thenReturn(notification);
+
+        Notification result = notificationController.update(1, notification);
+
+        assertEquals("Updated", result.getText());
+    }
+
+    @Test
+    void testDeleteNotification() {
+        doNothing().when(notificationService).deleteNotification(1);
+
+        String result = notificationController.delete(1);
+
+        assertEquals("Notification deleted successfully", result);
+        verify(notificationService, times(1)).deleteNotification(1);
+    }
+
+    @Test
+    void testGetNotificationsByUser() {
+        when(notificationService.getNotificationsByUserId(1))
+                .thenReturn(List.of(new Notification()));
+
+        List<Notification> result = notificationController.getByUser(1);
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testSearchNotifications() {
+        when(notificationService.searchByText("task"))
+                .thenReturn(List.of(new Notification()));
+
+        List<Notification> result = notificationController.search("task");
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetLatestNotifications() {
+        when(notificationService.getLatestNotifications())
+                .thenReturn(List.of(new Notification()));
+
+        List<Notification> result = notificationController.getLatest();
+
+        assertEquals(1, result.size());
+    }
+}

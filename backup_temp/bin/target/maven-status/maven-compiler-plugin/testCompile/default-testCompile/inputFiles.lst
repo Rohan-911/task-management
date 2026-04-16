@@ -1,0 +1,7 @@
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/BackendApplicationTests.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/category/controller/CategoryControllerTest.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/category/service/CategoryServiceTest.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/taskservice/controller/TaskControllerTest.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/taskservice/service/TaskServiceTest.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/user/service/AuthServiceTest.java
+/Users/prathmeshpawar/task-management/task-management/backend/src/test/java/com/task/user/service/UserServiceTest.java
