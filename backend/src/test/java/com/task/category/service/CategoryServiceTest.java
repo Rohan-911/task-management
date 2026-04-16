@@ -4,8 +4,9 @@ import com.task.category.entity.Category;
 import com.task.category.entity.Notification;
 import com.task.category.repository.CategoryRepository;
 import com.task.category.repository.NotificationRepository;
-import com.task.category.exception.CategoryNotFoundException;
-import com.task.category.exception.BadRequestException;
+import com.task.exception.BadRequestException;
+import com.task.exception.CategoryNotFoundException;
+
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

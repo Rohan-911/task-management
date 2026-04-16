@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 
 public class ProjectRequestDto {
 
-    @NotNull
     private Integer projectId;
 
     @NotBlank

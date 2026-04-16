@@ -1,11 +1,26 @@
 package com.task.user.dto;
 
+import jakarta.validation.constraints.*;
+
 public class UserRequestDTO {
 
-    private Integer userId; 
+    @NotNull(message = "UserID is required")
+    private Integer userId;
+
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 20, message = "Username must be 3-20 characters")
     private String username;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 4, message = "Password must be at least 4 characters")
     private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    @Pattern(regexp = "^[a-z0-9@._-]+$", message = "Email must not contain uppercase letters")
     private String email;
+
+    @NotBlank(message = "Full Name is required")
     private String fullName;
 
     public Integer getUserId() { return userId; }

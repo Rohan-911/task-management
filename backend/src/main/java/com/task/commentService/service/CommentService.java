@@ -15,28 +15,35 @@ public class CommentService {
 
     @Autowired
     private CommentRepository repo;
-
+    
+    // CREATE
     public Comment save(Comment c) {
         c.setCreatedAt(new Date());
         return repo.save(c);
     }
-
-    public List<Comment> getByTask(Integer taskId) {
-        return repo.findByTaskID(taskId);
+    
+    // GET BY ID
+    public Comment getById(Integer id) {
+        return repo.findById(id).orElse(null);
     }
+    
+    // GET ALL
     public List<Comment> getAll() {
-        return repo.findAll();
+    return repo.findAll();
     }
     
-    public List<Comment> getByUser(Integer userId) {
-        return repo.findByUserID(userId);
-    }
-    
+    // DELETE
     public void delete(Integer id) {
         repo.deleteById(id);
     }
     
-    public Comment getById(Integer id) {
-        return repo.findById(id).orElse(null);
+    // GET BY TASK
+    public List<Comment> getByTaskId(Integer taskId) {
+    return repo.findByTask_TaskID(taskId);
+    }
+
+    // GET USER BY ID 
+    public List<Comment> getByUser(Integer userId) {
+    return repo.findByUserID(userId);
     }
 }

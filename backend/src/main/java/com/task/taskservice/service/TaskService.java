@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.task.exception.ResourceNotFoundException;
 import com.task.taskservice.entity.Task;
-import com.task.taskservice.exception.ResourceNotFoundException;
 import com.task.taskservice.repository.TaskRepository;
 
 @Service

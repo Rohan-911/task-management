@@ -1,19 +1,10 @@
 package com.task.user.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import com.task.user.dto.LoginRequestDTO;
 import com.task.user.entity.User;
@@ -22,87 +13,121 @@ import com.task.user.entity.UserRoles;
 import com.task.user.repository.UserRepository;
 import com.task.user.security.JwtUtil;
 
-public class AuthServiceTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-    @Mock
-    private UserRepository userRepository;
+@ExtendWith(MockitoExtension.class)
+class AuthServiceTest {
 
-    @Mock
-    private JwtUtil jwtUtil;
+	@Mock
+	private UserRepository userRepository;
 
-    @InjectMocks
-    private AuthService authService;
+	@Mock
+	private JwtUtil jwtUtil;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
+	@InjectMocks
+	private AuthService authService;
 
-    @Test
-    void loginSuccess() {
+	private LoginRequestDTO dto;
 
-      
-        User user = new User();
-        user.setUserId(1);
-        user.setUsername("john_doe");
-        user.setPassword("password123");
+	@BeforeEach
+	void setup() {
+		dto = new LoginRequestDTO();
+		dto.setUsername("john");
+		dto.setPassword("1234");
+	}
 
-       
-        UserRole role = new UserRole();
-        role.setRoleName("User");
+	@Test
+	void login_success_withRoles() {
 
-        UserRoles ur = new UserRoles();
-        ur.setRole(role);
+		User user = new User();
+		user.setUserId(1);
+		user.setUsername("john");
+		user.setPassword("1234");
 
-        user.setUserRoles(List.of(ur));
+		UserRole role = new UserRole();
+		role.setRoleName("ADMIN");
 
-       
-        when(userRepository.findByUsernameWithRoles("john_doe"))
-                .thenReturn(Optional.of(user));
+		UserRoles ur = new UserRoles();
+		ur.setRole(role);
 
-        when(jwtUtil.generateToken(anyString(), anyList()))
-                .thenReturn("mock_token");
+		user.setUserRoles(List.of(ur));
 
-        LoginRequestDTO dto = new LoginRequestDTO();
-        dto.setUsername("john_doe");
-        dto.setPassword("password123");
+		when(userRepository.findByUsernameWithRoles("john")).thenReturn(Optional.of(user));
 
-        var response = authService.login(dto);
+		when(jwtUtil.generateToken(anyString(), anyList())).thenReturn("mocked-token");
 
-        assertEquals("mock_token", response.getToken());
-        assertEquals(1, response.getUserId());
-        assertEquals(1, response.getRoles().size());
-    }
+		var response = authService.login(dto);
 
-    @Test
-    void loginUserNotFound() {
+		assertNotNull(response);
+		assertEquals("mocked-token", response.getToken());
+		assertEquals(1, response.getUserId());
+		assertEquals(List.of("ADMIN"), response.getRoles());
 
-       
-        when(userRepository.findByUsernameWithRoles("abc"))
-                .thenReturn(Optional.empty());
+		verify(jwtUtil, times(1)).generateToken(eq("john"), anyList());
+	}
 
-        LoginRequestDTO dto = new LoginRequestDTO();
-        dto.setUsername("abc");
-        dto.setPassword("123");
+	@Test
+	void login_success_noRoles() {
 
-        assertThrows(RuntimeException.class, () -> authService.login(dto));
-    }
+		User user = new User();
+		user.setUserId(2);
+		user.setUsername("john");
+		user.setPassword("1234");
+		user.setUserRoles(List.of());
+		when(userRepository.findByUsernameWithRoles("john")).thenReturn(Optional.of(user));
 
-    @Test
-    void loginWrongPassword() {
+		when(jwtUtil.generateToken(anyString(), anyList())).thenReturn("token");
 
-        User user = new User();
-        user.setUsername("john");
-        user.setPassword("correct");
+		var response = authService.login(dto);
 
-        
-        when(userRepository.findByUsernameWithRoles("john"))
-                .thenReturn(Optional.of(user));
+		assertNotNull(response);
+		assertEquals(List.of(), response.getRoles());
+	}
 
-        LoginRequestDTO dto = new LoginRequestDTO();
-        dto.setUsername("john");
-        dto.setPassword("wrong");
+	@Test
+	void login_roleIsNull_shouldNotFail() {
 
-        assertThrows(RuntimeException.class, () -> authService.login(dto));
-    }
+		User user = new User();
+		user.setUserId(3);
+		user.setUsername("john");
+		user.setPassword("1234");
+
+		UserRoles ur = new UserRoles();
+		ur.setRole(null); // null role
+
+		user.setUserRoles(List.of(ur));
+
+		when(userRepository.findByUsernameWithRoles("john")).thenReturn(Optional.of(user));
+
+		when(jwtUtil.generateToken(anyString(), anyList())).thenReturn("token");
+
+		var response = authService.login(dto);
+
+		assertNotNull(response);
+		assertEquals(List.of(), response.getRoles());
+	}
+
+	@Test
+	void login_userNotFound() {
+
+		when(userRepository.findByUsernameWithRoles("john")).thenReturn(Optional.empty());
+
+		assertThrows(RuntimeException.class, () -> authService.login(dto));
+	}
+
+	@Test
+	void login_invalidPassword() {
+
+		User user = new User();
+		user.setUsername("john");
+		user.setPassword("wrong");
+
+		when(userRepository.findByUsernameWithRoles("john")).thenReturn(Optional.of(user));
+
+		assertThrows(RuntimeException.class, () -> authService.login(dto));
+	}
 }
