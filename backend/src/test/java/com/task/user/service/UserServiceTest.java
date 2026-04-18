@@ -12,6 +12,10 @@ import com.task.user.dto.UserRequestDTO;
 import com.task.user.entity.*;
 import com.task.user.repository.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -167,19 +171,21 @@ class UserServiceTest {
 	@Test
 	void getAllUsers_success() {
 
-		when(userRepository.findAllUsersWithRoles()).thenReturn(List.of(new User(), new User()));
+		Page<User> page = new PageImpl<>(List.of(new User(), new User()));
+		when(userRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-		var result = userService.getAllUsers();
+		var result = userService.getAllUsers(0, 10);
 
-		assertEquals(2, result.size());
+		assertEquals(2, result.getContent().size());
 	}
 
 	@Test
 	void searchUsers_success() {
 
-		when(userRepository.findByUsernameContainingIgnoreCase("john")).thenReturn(List.of(new User()));
+		Page<User> page = new PageImpl<>(List.of(new User()));
+		when(userRepository.findByUsernameContainingIgnoreCase(eq("john"), any(Pageable.class))).thenReturn(page);
 
-		var result = userService.searchUsers("john");
+		var result = userService.searchUsers("john", 0, 10);
 
 		assertNotNull(result);
 	}
@@ -213,9 +219,10 @@ class UserServiceTest {
 	@Test
 	void getUsersByRole_success() {
 
-		when(userRepository.findUsersByRole("ADMIN")).thenReturn(List.of(new User()));
+		Page<User> page = new PageImpl<>(List.of(new User()));
+		when(userRepository.findUsersByRole(eq("ADMIN"), any(Pageable.class))).thenReturn(page);
 
-		var result = userService.getUsersByRole("ADMIN");
+		var result = userService.getUsersByRole("ADMIN", 0, 10);
 
 		assertNotNull(result);
 	}
@@ -223,8 +230,9 @@ class UserServiceTest {
 	@Test
 	void getUsersByRole_notFound() {
 
-		when(userRepository.findUsersByRole("ADMIN")).thenReturn(List.of());
+		Page<User> page = new PageImpl<>(List.of());
+		when(userRepository.findUsersByRole(eq("ADMIN"), any(Pageable.class))).thenReturn(page);
 
-		assertThrows(ResourceNotFoundException.class, () -> userService.getUsersByRole("ADMIN"));
+		assertThrows(ResourceNotFoundException.class, () -> userService.getUsersByRole("ADMIN", 0, 10));
 	}
 }
