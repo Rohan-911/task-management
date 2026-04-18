@@ -35,11 +35,11 @@ class AttachmentServiceTest {
 
         when(repo.save(a)).thenReturn(a);
 
-        Attachment saved = service.save(a);
+		Attachment saved = service.save(a);
 
-        assertNotNull(saved);
-        assertEquals("junit.txt", saved.getFileName());
-    }
+		assertNotNull(saved);
+		assertEquals("junit.txt", saved.getFileName());
+	}
 
     // TEST GET ALL
     @Test
