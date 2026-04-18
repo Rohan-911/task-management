@@ -72,7 +72,7 @@ class UserServiceTest {
 		assertNotNull(response);
 		assertEquals("john", response.getUsername());
 
-		verify(userRolesRepository, times(1)).save(any());
+		verify(userRolesRepository, times(1)).saveAll(any());
 	}
 
 	@Test
@@ -196,6 +196,7 @@ class UserServiceTest {
 		User user = new User();
 		user.setUserId(1);
 		user.setUsername("old");
+		user.setEmail("old@mail.com");
 
 		when(userRepository.findByIdWithRoles(1)).thenReturn(Optional.of(user));
 
