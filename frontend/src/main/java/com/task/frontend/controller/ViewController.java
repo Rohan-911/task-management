@@ -1,4 +1,4 @@
-package com.task.ui.controller;
+package com.task.frontend.controller;
 
 import java.util.List;
 
@@ -8,18 +8,18 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import com.task.user.dto.UserRequestDTO;
-import com.task.user.dto.UserResponseDTO;
-import com.task.user.service.UserService;
+import com.task.frontend.dto.UserRequestDTO;
+import com.task.frontend.dto.UserResponseDTO;
+import com.task.frontend.service.FrontendUserService;
 
 import jakarta.validation.Valid;
 
 @Controller
 public class ViewController {
 
-    private final UserService userService;
+    private final FrontendUserService userService;
 
-    public ViewController(UserService userService) {
+    public ViewController(FrontendUserService userService) {
         this.userService = userService;
     }
 
@@ -29,7 +29,11 @@ public class ViewController {
     }
 
     @GetMapping("/logout")
-    public String logout() {
+    public String logout(jakarta.servlet.http.HttpServletRequest request) {
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
         return "redirect:/";
     }
 
@@ -307,7 +311,37 @@ public class ViewController {
 
     // ================= MY PROFILE =================
     @GetMapping("/current-user")
-    public String myProfile() {
+    public String myProfile(Model model, @RequestParam(required = false) String success) {
+        if (success != null) {
+            model.addAttribute("success", success);
+        }
+        
+        try {
+            UserResponseDTO currentUser = userService.getCurrentUser();
+            UserRequestDTO dto = new UserRequestDTO();
+            dto.setUsername(currentUser.getUsername());
+            dto.setEmail(currentUser.getEmail());
+            dto.setFullName(currentUser.getFullName());
+            dto.setPassword(""); // leave blank by default
+            model.addAttribute("user", dto);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to load profile. Please log in again.");
+            return "redirect:/";
+        }
         return "my-profile";
+    }
+
+    @PostMapping("/current-user")
+    public String updateMyProfile(@ModelAttribute("user") UserRequestDTO dto, Model model) {
+        try {
+            if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
+                dto.setPassword("dummyPassword"); // Handle backend constraint if needed
+            }
+            userService.updateCurrentUser(dto);
+            return "redirect:/current-user?success=Profile updated successfully";
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to update profile: " + e.getMessage());
+            return "my-profile";
+        }
     }
 }
