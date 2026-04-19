@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <!-- HEADER -->
+    <div style="text-align:center; margin-bottom:30px;">
+        <h2 style="font-weight:700; color:#1e293b;">
+            <span style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);
+                         -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+                User Dashboard
+            </span>
+        </h2>
+
+        <div style="margin-top:12px; display:flex; justify-content:center;
+                    align-items:center; gap:12px; flex-wrap:wrap;">
+
+            <span style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);
+                         color:white; padding:5px 14px; border-radius:20px;
+                         font-size:13px; font-weight:600; letter-spacing:0.5px;">
+                👤 USER
+            </span>
+
+            <span id="userUsername"
+                  style="color:#475569; font-weight:500;"></span>
+
+            <span style="color:#16a34a; font-weight:600;">
+                Authenticated ✔
+            </span>
+
+            <a href="/logout"
+               onclick="localStorage.clear();"
+               style="background:linear-gradient(135deg,#dc2626,#b91c1c);
+                      color:white; padding:6px 16px; border-radius:8px;
+                      text-decoration:none; font-weight:500; font-size:14px;
+                      transition:transform 0.2s;"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- INFO BANNER -->
+    <div style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);
+                border:1px solid #bae6fd; border-radius:10px;
+                padding:14px 20px; margin-bottom:25px; text-align:center;">
+        <span style="color:#0369a1; font-size:14px;">
+            ℹ️ You have <strong>User</strong> access. Contact an admin for elevated permissions.
+        </span>
+    </div>
+
+    <!-- ==================== USER APIs ==================== -->
+    <div style="margin-bottom:30px;">
+        <h4 style="color:#1e293b; margin-bottom:12px;
+                   border-left:4px solid #0ea5e9; padding-left:12px;">
+            🔗 Available APIs
+        </h4>
+
+        <div style="background:white; border-radius:12px;
+                    box-shadow:0 4px 15px rgba(0,0,0,0.08); overflow:hidden;">
+
+            <table style="width:100%; text-align:center; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:linear-gradient(135deg,#0c4a6e,#075985);">
+                        <th style="color:white; padding:14px; font-weight:600;">Method</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Endpoint</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Action</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr class="api-row">
+                        <td><span class="method-badge method-post">POST</span></td>
+                        <td class="endpoint">/api/login</td>
+                        <td><a href="/" class="action-btn">Open</a></td>
+                        <td class="desc">User Login</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users</td>
+                        <td><a href="/users-view" class="action-btn">View</a></td>
+                        <td class="desc">Get all users</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users/{id}</td>
+                        <td><a href="/user-by-id" class="action-btn">Try</a></td>
+                        <td class="desc">Get user by ID</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users/me</td>
+                        <td><a href="/current-user" class="action-btn">View</a></td>
+                        <td class="desc">Current logged-in user</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users/search</td>
+                        <td><a href="/user-search" class="action-btn">Search</a></td>
+                        <td class="desc">Search user</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users/role</td>
+                        <td><a href="/user-role" class="action-btn">Filter</a></td>
+                        <td class="desc">Filter by role</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/users/{id}/roles</td>
+                        <td><a href="/user-roles" class="action-btn">View</a></td>
+                        <td class="desc">Get user roles</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint">/api/roles</td>
+                        <td><a href="/roles-view" class="action-btn">View</a></td>
+                        <td class="desc">Get all roles</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<style>
+/* === TABLE ROWS === */
+.api-row {
+    transition: background 0.2s;
+}
+.api-row:hover {
+    background: #f8fafc;
+}
+.api-row td {
+    padding: 14px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+/* === METHOD BADGES === */
+.method-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+    text-align: center;
+}
+.method-get     { background:#dbeafe; color:#1d4ed8; }
+.method-post    { background:#dcfce7; color:#15803d; }
+
+/* === ENDPOINT TEXT === */
+.endpoint {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #334155;
+    font-size: 13px;
+}
+
+/* === DESCRIPTION === */
+.desc {
+    color: #64748b;
+}
+
+/* === ACTION BUTTONS === */
+.action-btn {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    min-width: 80px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14,165,233,0.35);
+}
+</style>
+
+<script>
+    // Show logged-in username
+    const name = localStorage.getItem("username");
+    if (name) {
+        document.getElementById("userUsername").textContent = "Welcome, " + name;
+    }
+    // Make endpoints clickable
+    document.querySelectorAll('.api-row').forEach(row => {
+        const btn = row.querySelector('.action-btn');
+        const endpointTd = row.querySelector('.endpoint');
+        if (btn && endpointTd) {
+            const url = btn.getAttribute('href');
+            const text = endpointTd.innerText;
+            endpointTd.innerHTML = `<a href="${url}" style="color:inherit; text-decoration:none; display:block; padding:14px 10px;">${text}</a>`;
+            endpointTd.style.cursor = 'pointer';
+            endpointTd.style.padding = '0'; // Remove default padding to let anchor tag fill
+            endpointTd.onmouseover = () => endpointTd.style.textDecoration = 'underline';
+            endpointTd.onmouseout = () => endpointTd.style.textDecoration = 'none';
+        }
+    });
+</script>
+
+</div>
+</html>

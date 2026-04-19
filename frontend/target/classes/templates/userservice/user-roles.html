@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <div style="max-width:500px; margin:auto;">
+
+        <h3 style="text-align:center; color:#1e293b; font-weight:700;">Get User Roles</h3>
+
+        <form action="/user-roles/result" method="get"
+              style="margin-top:20px;">
+
+            <input name="id" placeholder="Enter User ID (e.g. 1)"
+                   required
+                   style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1;">
+
+            <button style="width:100%; margin-top:10px;
+                           background:#2563eb; color:white;
+                           padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">
+                Get Roles
+            </button>
+        </form>
+
+        <div th:if="${roles != null}" style="margin-top:25px; background:white;
+                                   padding:20px; border-radius:10px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+            <h5 style="color:#1e293b; margin-bottom:15px;">Assigned Roles</h5>
+            
+            <div th:if="${roles.isEmpty()}" style="color:#64748b;">
+                No roles assigned to this user.
+            </div>
+            
+            <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
+                <span th:each="role : ${roles}" 
+                      style="background:#e0f2fe; color:#0284c7; padding:6px 12px;
+                             border-radius:20px; font-size:14px; font-weight:600; letter-spacing:0.5px;"
+                      th:text="${role}"></span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</html>
