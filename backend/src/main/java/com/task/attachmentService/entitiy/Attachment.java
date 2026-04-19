@@ -1,7 +1,5 @@
 package com.task.attachmentService.entitiy;
 
-
-
 import com.task.taskservice.entity.Task;
 
 import jakarta.persistence.Entity;
@@ -19,40 +17,38 @@ public class Attachment {
     private String filePath;
 
     @ManyToOne
-    @JoinColumn(name = "taskID")
+    @JoinColumn(name = "TaskID")
     private Task task;
 
-	public Integer getAttachmentID() {
-		return attachmentID;
-	}
+    public Integer getAttachmentID() {
+        return attachmentID;
+    }
 
-	public void setAttachmentID(Integer attachmentID) {
-		this.attachmentID = attachmentID;
-	}
+    public void setAttachmentID(Integer attachmentID) {
+        this.attachmentID = attachmentID;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public String getFilePath() {
-		return filePath;
-	}
+    public String getFilePath() {
+        return filePath;
+    }
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
-	public Task getTask() {
-		return task;
-	}
+    public Task getTask() {
+        return task;
+    }
 
-	public void setTask(Task task) {
-		this.task = task;
-	}
-    
-    
+    public void setTask(Task task) {
+        this.task = task;
+    }
 }

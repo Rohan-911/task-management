@@ -1,0 +1,10 @@
+C:\task-management\frontend\src\main\java\com\task\frontend\dto\RestResponsePage.java
+C:\task-management\frontend\src\main\java\com\task\frontend\dto\UserResponseDTO.java
+C:\task-management\frontend\src\main\java\com\task\frontend\config\RestTemplateConfig.java
+C:\task-management\frontend\src\main\java\com\task\frontend\FrontendApplication.java
+C:\task-management\frontend\src\main\java\com\task\frontend\service\FrontendUserService.java
+C:\task-management\frontend\src\main\java\com\task\frontend\dto\LoginRequestDTO.java
+C:\task-management\frontend\src\main\java\com\task\frontend\dto\UserRequestDTO.java
+C:\task-management\frontend\src\main\java\com\task\frontend\controller\AuthController.java
+C:\task-management\frontend\src\main\java\com\task\frontend\controller\ViewController.java
+C:\task-management\frontend\src\main\java\com\task\frontend\dto\AuthResponseDTO.java

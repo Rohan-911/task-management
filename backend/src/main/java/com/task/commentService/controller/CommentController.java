@@ -41,7 +41,7 @@ public class CommentController {
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Integer id) {
         service.delete(id);
-        return "Comment deleted successfully";
+        return "Comment deleted"; // FIXED (match test)
     }
     
     //GET BY TASK

@@ -45,4 +45,17 @@ public class AttachmentController {
     public List<Attachment> getByTask(@PathVariable Integer taskId) {
         return service.getByTaskId(taskId);
     }
+
+    // NEW: COUNT
+    @GetMapping("/count/{taskId}")
+    public int countByTask(@PathVariable Integer taskId) {
+        return service.countByTask(taskId);
+    }
+
+    // NEW: DELETE BY TASK
+    @DeleteMapping("/task/{taskId}")
+    public String deleteByTask(@PathVariable Integer taskId) {
+        service.deleteByTask(taskId);
+        return "All attachments deleted for task " + taskId;
+    }
 }
