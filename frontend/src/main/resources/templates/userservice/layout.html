@@ -57,14 +57,20 @@
     <a class="navbar-brand text-white fw-bold" href="/dashboard">Task System</a>
 
     <div class="ms-auto" style="display:flex; gap:10px; align-items:center;">
-        <a href="/current-user" class="btn btn-primary btn-sm">My Profile</a>
-        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/api/users/me" class="btn btn-primary btn-sm">My Profile</a>
+        <form th:action="@{/logout}" method="post" style="display:inline; margin:0; padding:0;">
+            <button type="submit" class="btn btn-danger btn-sm" style="border:none;">Logout</button>
+        </form>
     </div>
 </nav>
 
 <!-- 🔥 IMPORTANT: THIS IS YOUR LAYOUT -->
 <div th:fragment="layout(content)">
     <div class="container content-container">
+        
+        <!-- Global Error Alert from query params -->
+        <div th:if="${param.error}" class="alert alert-danger mt-3" style="font-weight: 500;" th:text="${param.error}"></div>
+
         <div th:replace="${content}"></div>
     </div>
 </div>

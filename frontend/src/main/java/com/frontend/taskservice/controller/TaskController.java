@@ -1,14 +1,25 @@
 package com.frontend.taskservice.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpStatusCodeException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frontend.taskservice.dto.TaskDTO;
 import com.frontend.taskservice.service.TaskService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/tasks")
@@ -17,99 +28,338 @@ public class TaskController {
     @Autowired
     private TaskService service;
 
-    @GetMapping("/id")
-    public String getTaskById(@RequestParam Integer id, Model model) {
-
-        TaskDTO task = service.getTaskById(id);
-        model.addAttribute("task", task);
-
-        return "taskservice/gettaskbyid"; 
+    
+    @GetMapping("/task-login")
+    public String showTaskLogin() {
+        return "taskservice/login";
     }
 
+    
+    @GetMapping("/task-endpoints")
+    public String showTaskEndpoints(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+ 
+
+        return "taskservice/task-endpoints";
+    }
+
+   
     @GetMapping
-    public String list(Model model) {
+    public String list(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
         model.addAttribute("tasks", service.getAllTasks());
         model.addAttribute("viewOnly", false);
         model.addAttribute("currentPage", 0);
-        return "taskservice/tasks";   
+
+        return "taskservice/tasks";
     }
 
+    
     @GetMapping("/view")
-    public String viewTasks(Model model) {
+    public String viewTasks(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
         model.addAttribute("tasks", service.getAllTasks());
         model.addAttribute("viewOnly", true);
         model.addAttribute("currentPage", 0);
-        return "taskservice/tasks";   
+
+        return "taskservice/tasks";
     }
 
+    
+    @GetMapping("/id")
+    public String getTaskById(@RequestParam Integer id,
+                             Model model,
+                             HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+        	TaskDTO task = service.getTaskById(id);
+        
+        model.addAttribute("task", task);
+
+        return "taskservice/gettaskbyid";
+        }catch (Exception ex) {
+        	model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
+    }
+
+    
     @GetMapping("/create")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
         model.addAttribute("task", new TaskDTO());
-        return "taskservice/create-task";   
+        return "taskservice/create-task";
     }
 
+    
     @PostMapping("/create")
-    public String createTask(@ModelAttribute TaskDTO task) {
-        service.createTask(task);
-        return "redirect:/tasks";
+    public String createTask(@ModelAttribute TaskDTO task,
+                             HttpServletRequest request,
+                             Model model) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
+        try {
+            service.createTask(task);
+            return "redirect:/tasks";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteTask(@PathVariable Integer id) {
-        service.deleteTask(id);
-        return "redirect:/tasks";
-    }
+    
 
+    
     @GetMapping("/edit/{id}")
-    public String editTask(@PathVariable Integer id, Model model) {
+    public String editTask(@PathVariable Integer id,
+                           Model model,
+                           HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
         TaskDTO task = service.getTaskById(id);
         model.addAttribute("task", task);
-        return "taskservice/edit-task";   
+
+        return "taskservice/edit-task";
     }
 
+    
     @GetMapping("/search")
-    public String searchTask(@RequestParam String name, Model model) {
+    public String searchTask(@RequestParam String name,
+                            Model model,
+                            HttpServletRequest request) {
 
-        List<TaskDTO> tasks = service.searchTasks(name);
-        model.addAttribute("tasks", tasks);
+        HttpSession session = request.getSession(false);
 
-        return "taskservice/search-task";   
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+            List<TaskDTO> tasks = service.searchTasks(name);
+            model.addAttribute("tasks", tasks);
+            return "taskservice/search-task";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
     }
 
     @GetMapping("/search/status")
-    public String searchByStatus(@RequestParam String status, Model model) {
+    public String searchByStatus(@RequestParam String status,
+                                Model model,
+                                HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
 
         List<TaskDTO> tasks = service.searchByStatus(status);
         model.addAttribute("tasks", tasks);
 
-        return "taskservice/search-status";   
+        return "taskservice/search-status";
     }
 
     @GetMapping("/search/priority")
-    public String searchByPriority(@RequestParam String priority, Model model) {
+    public String searchByPriority(@RequestParam String priority,
+                                  Model model,
+                                  HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
 
         List<TaskDTO> tasks = service.searchByPriority(priority);
         model.addAttribute("tasks", tasks);
 
-        return "taskservice/search-priority";   
+        return "taskservice/search-priority";
     }
 
     @GetMapping("/project")
-    public String getByProject(@RequestParam Integer projectId, Model model) {
+    public String getByProject(@RequestParam Integer projectId,
+                              Model model,
+                              HttpServletRequest request) {
 
-        List<TaskDTO> tasks = service.getByProject(projectId);
-        model.addAttribute("tasks", tasks);
+        HttpSession session = request.getSession(false);
 
-        return "taskservice/gettaskbyprojectid";   
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+            List<TaskDTO> tasks = service.getByProject(projectId);
+
+            if (tasks == null || tasks.isEmpty()) {
+                model.addAttribute("errorMessage", "Project ID does not exist");
+                return "error";
+            }
+
+            model.addAttribute("tasks", tasks);
+            return "taskservice/gettaskbyprojectid";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
     }
 
     @GetMapping("/user")
-    public String getByUser(@RequestParam Integer userId, Model model) {
+    public String getByUser(@RequestParam Integer userId,
+                           Model model,
+                           HttpServletRequest request) {
 
-        List<TaskDTO> tasks = service.getByUser(userId);
-        model.addAttribute("tasks", tasks);
+        HttpSession session = request.getSession(false);
 
-        return "taskservice/gettaskbyuser";   
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+            List<TaskDTO> tasks = service.getByUser(userId);
+
+            if (tasks == null || tasks.isEmpty()) {
+                model.addAttribute("errorMessage", "User ID does not exist");
+                return "error";
+            }
+
+            model.addAttribute("tasks", tasks);
+            return "taskservice/gettaskbyuser";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
     }
+
     
+    private boolean isAdmin(HttpSession session) {
+        List<String> roles = (List<String>) session.getAttribute("ROLES");
+
+        return roles != null &&
+               roles.stream().anyMatch(r -> r.equalsIgnoreCase("admin"));
+    }
+    @GetMapping("/filter")
+    public String filterTasks(@RequestParam(required = false) String status,
+                             @RequestParam(required = false) String priority,
+                             Model model,
+                             HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        // 👉 First open page (no params)
+        if (status == null || priority == null) {
+            return "taskservice/filter-tasks";
+        }
+
+        try {
+            List<TaskDTO> tasks = service.filterTasks(status, priority);
+            model.addAttribute("tasks", tasks);
+            return "taskservice/filter-tasks";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
+    }
+    @GetMapping("/count")
+    public String countTasks(@RequestParam(required = false) String status,
+                             Model model,
+                             HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        // 👉 First open page (no param)
+        if (status == null) {
+            return "taskservice/count";
+        }
+
+        try {
+            Long count = service.countTasksByStatus(status);
+            model.addAttribute("count", count);
+            model.addAttribute("status", status);
+            return "taskservice/count";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error";
+        }
+    }
+    private String extractMessage(HttpStatusCodeException ex) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            Map<String, Object> error = mapper.readValue(
+                    ex.getResponseBodyAsString(),
+                    Map.class
+            );
+
+            return (String) error.get("message");
+
+        } catch (Exception e) {
+            return "Something went wrong";
+        }
+    }
+   
 }
