@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 40px;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 40px;
+        }
+
+        .profile-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        /* Auth Section */
+        .auth-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .auth-status {
+            font-weight: 600;
+            color: #059669;
+            margin-right: 15px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Forms & Inputs */
+        .login-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        input {
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            ring: 2px solid #93c5fd;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-logout {
+            background-color: #ef4444;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-link {
+            color: #3b82f6;
+            background: none;
+            padding: 0;
+            font-weight: 600;
+            box-shadow: none;
+        }
+
+        .btn-link:hover {
+            color: #1d4ed8;
+            background: none;
+            transform: none;
+            text-decoration: underline;
+        }
+
+        .locked-badge {
+            color: #64748b;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .error-msg {
+            color: #dc2626;
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="profile-card">
+        <h1 class="profile-name">Prathmesh Pawar</h1>
+    </div>
+
+    <h1>API Dashboard</h1>
+
+    <!-- AUTHENTICATION SECTION -->
+    <div class="auth-section">
+        <div th:if="${loginError}" class="error-msg">
+            <span th:text="${loginError}">Error Message</span>
+        </div>
+
+        <div th:if="${session.jwtToken == null}">
+            <h3 style="margin-top: 0; font-size: 16px;">Login to Access API Endpoints</h3>
+            <form action="/do-login" method="post" class="login-form" autocomplete="off">
+                <input name="username" placeholder="Username" required autocomplete="off"/>
+                <input type="password" name="password" placeholder="Password" required autocomplete="new-password"/>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+        <div th:if="${session.jwtToken != null}">
+            <span class="auth-status">Authenticated ✓</span>
+            <a href="/logout" class="btn btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- CATEGORY -->
+    <h2>Category APIs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>API Endpoint</th>
+                <th>Action</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="/categories/all" class="btn-link">GET /api/categories/all</a></td>
+                <td><a href="/categories/all" class="btn">Run All</a></td>
+                <td>Retrieve all existing task categories.</td>
+            </tr>
+            <tr>
+                <td><a href="/categories/search" class="btn-link">GET /api/categories/search</a></td>
+                <td><a href="/categories/search" class="btn">Open Form</a></td>
+                <td>Find a specific category using its ID.</td>
+            </tr>
+            <tr>
+                <td><a href="/categories/search/name" class="btn-link">GET /api/categories/search/name</a></td>
+                <td><a href="/categories/search/name" class="btn">Open Form</a></td>
+                <td>Search for categories by their display name.</td>
+            </tr>
+            <tr>
+                <td><a href="/categories/task" class="btn-link">GET /api/categories/task</a></td>
+                <td><a href="/categories/task" class="btn">Open Form</a></td>
+                <td>Get categories associated with a specific Task ID.</td>
+            </tr>
+            <tr>
+                <td><a href="/categories/create" class="btn-link">POST /api/categories/create</a></td>
+                <td>
+                    <a th:if="${session.isAdmin == true}" href="/categories/create" class="btn">Open Form</a>
+                    <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
+                </td>
+                <td>Register a new category in the system.</td>
+            </tr>
+            <tr>
+                <td><a href="/categories/delete" class="btn-link">DELETE /api/categories/delete</a></td>
+                <td>
+                    <a th:if="${session.isAdmin == true}" href="/categories/delete" class="btn">Open Form</a>
+                    <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
+                </td>
+                <td>Permanently remove a category by its ID.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- NOTIFICATION -->
+    <h2>Notification APIs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>API Endpoint</th>
+                <th>Action</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="/notifications/all" class="btn-link">GET /api/notifications/all</a></td>
+                <td><a href="/notifications/all" class="btn">Run All</a></td>
+                <td>View a list of all system notifications.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/id" class="btn-link">GET /api/notifications/id</a></td>
+                <td><a href="/notifications/id" class="btn">Open Form</a></td>
+                <td>Get details of a single notification by ID.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/user" class="btn-link">GET /api/notifications/user</a></td>
+                <td><a href="/notifications/user" class="btn">Open Form</a></td>
+                <td>Fetch notifications sent to a specific user.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/search" class="btn-link">GET /api/notifications/search</a></td>
+                <td><a href="/notifications/search" class="btn">Open Form</a></td>
+                <td>Filter notifications containing specific text.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/latest" class="btn-link">GET /api/notifications/latest</a></td>
+                <td><a href="/notifications/latest" class="btn">Run Latest</a></td>
+                <td>Fetch the most recently generated notifications.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/create" class="btn-link">POST /api/notifications/create</a></td>
+                <td>
+                    <a th:if="${session.isAdmin == true}" href="/notifications/create" class="btn">Open Form</a>
+                    <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
+                </td>
+                <td>Send a new notification to a user.</td>
+            </tr>
+            <tr>
+                <td><a href="/notifications/delete" class="btn-link">DELETE /api/notifications/delete</a></td>
+                <td>
+                    <a th:if="${session.isAdmin == true}" href="/notifications/delete" class="btn">Open Form</a>
+                    <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
+                </td>
+                <td>Delete a specific notification record.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
