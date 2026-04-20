@@ -45,12 +45,14 @@ public class AuthController {
             if (response != null && response.getToken() != null) {
 
                 HttpSession session = request.getSession();
-                session.setAttribute("JWT_TOKEN", response.getToken());
+                session.setAttribute("jwtToken", response.getToken());
                 session.setAttribute("USERNAME", username);
 
                 boolean isAdmin = response.getRoles() != null &&
                         response.getRoles().stream()
-                                .anyMatch(r -> r.equalsIgnoreCase("admin"));
+                                .anyMatch(r -> r.equalsIgnoreCase("admin") || r.equalsIgnoreCase("ROLE_ADMIN"));
+
+                session.setAttribute("isAdmin", isAdmin);
 
                 if (isAdmin) {
                     return "redirect:/admin-dashboard";
