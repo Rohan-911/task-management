@@ -27,18 +27,41 @@ public class AttachmentService {
 
     // GET ALL
     public List<AttachmentDTO> getAll() {
-        String url = backendUrl + "/api/attachments";
-        return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<AttachmentDTO>>() {});
+        try {
+            String url = backendUrl + "/api/attachments";
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<AttachmentDTO>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch attachments: " + e.getMessage());
+        }
+    }
+
+    // GET PAGINATED
+    public com.frontend.commentservice.dto.PagedResponse<AttachmentDTO> getAllPaginated(int page, int size) {
+        try {
+            String url = backendUrl + "/api/attachments/list/all?page=" + page + "&size=" + size;
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<com.frontend.commentservice.dto.PagedResponse<AttachmentDTO>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch paginated attachments: " + e.getMessage());
+        }
     }
 
     // GET BY ID
     public AttachmentDTO getById(Integer id) {
-        String url = backendUrl + "/api/attachments/" + id;
-        return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
-                .retrieve()
-                .body(AttachmentDTO.class);
+        try {
+            String url = backendUrl + "/api/attachments/item/" + id;
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .onStatus(status -> status.value() == 404, (req, res) -> {
+                        throw new RuntimeException("Attachment not found with ID: " + id);
+                    })
+                    .body(AttachmentDTO.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     // CREATE
@@ -51,10 +74,17 @@ public class AttachmentService {
 
     // DELETE
     public void delete(Integer id) {
-        String url = backendUrl + "/api/attachments/" + id;
-        jwtInterceptor.addAuthHeader(restClient.delete().uri(url))
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            String url = backendUrl + "/api/attachments/item/" + id;
+            jwtInterceptor.addAuthHeader(restClient.delete().uri(url))
+                    .retrieve()
+                    .onStatus(status -> status.value() == 404, (req, res) -> {
+                        throw new RuntimeException("Cannot delete. Attachment not found with ID: " + id);
+                    })
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     // GET BY TASK

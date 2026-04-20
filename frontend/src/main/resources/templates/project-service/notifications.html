@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifications</title>
+    <style>
+        body {
+            background-color: #f8f9fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .method-badge {
+            color: green;
+            font-weight: 700;
+        }
+
+        .lookup-box {
+            background: #f8fafc;
+            border: 1px solid #e5edf5;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+
+        .lookup-row {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .lookup-row input {
+            flex: 1;
+            padding: 11px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+        }
+
+        .btn {
+            padding: 11px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: green;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #eef2f7;
+            color: #334155;
+        }
+
+        .error-box {
+            background: #fff1f1;
+            border: 1px solid #ffd2d2;
+            color: #b42318;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .empty-box {
+            padding: 24px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #eef2f7;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-box">
+    <div class="header-row">
+        <div>
+            <h2 style="margin: 0;">Notifications</h2>
+            <p style="margin: 6px 0 0; color: #64748b;">Fetch notifications by user ID.</p>
+        </div>
+        <div class="method-badge">GET</div>
+    </div>
+
+    <div th:if="${formError}" class="error-box" th:text="${formError}"></div>
+
+    <div class="lookup-box">
+        <form th:action="@{/ui/notifications}" th:object="${notificationSearchRequest}" method="post">
+            <label style="display:block; margin-bottom:6px; font-weight:600; color:#334155;">Get Notifications By User ID</label>
+            <div class="lookup-row">
+                <input type="number" th:field="*{userId}" placeholder="Enter user id">
+                <button type="submit" class="btn btn-primary">Get Notifications</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${hasSearchedNotifications == true and #lists.isEmpty(notifications)}" class="empty-box">
+        No notifications found for this user.
+    </div>
+
+    <table th:if="${hasSearchedNotifications == true and !#lists.isEmpty(notifications)}">
+        <thead>
+        <tr>
+            <th>Notification ID</th>
+            <th>Message/Text</th>
+            <th>Created At</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="notification : ${notifications}">
+            <td th:text="${notification.notificationId}"></td>
+            <td th:text="${notification.text}"></td>
+            <td th:text="${notification.createdAt}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <a th:href="@{/ui/projects/dashboard}" class="btn btn-secondary">Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

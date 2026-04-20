@@ -23,6 +23,9 @@
 <div class="form-box">
     <h4 class="form-title">💬 Create Comment</h4>
 
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <!-- POST /api/comments -->
     <form method="post" action="/comment/create" th:object="${comment}">
 

@@ -27,40 +27,67 @@ public class CommentService {
 
     // GET ALL
     public List<CommentDTO> getAll() {
-        String url = backendUrl + "/api/comments";
-        return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<CommentDTO>>() {});
+        try {
+            String url = backendUrl + "/api/comments";
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<CommentDTO>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch comments: " + e.getMessage());
+        }
+    }
+
+    // GET PAGINATED
+    public com.frontend.commentservice.dto.PagedResponse<CommentDTO> getAllPaginated(int page, int size) {
+        try {
+            String url = backendUrl + "/api/comments/list/all?page=" + page + "&size=" + size;
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<com.frontend.commentservice.dto.PagedResponse<CommentDTO>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch paginated comments: " + e.getMessage());
+        }
     }
 
     // GET BY ID
     public CommentDTO getById(Integer id) {
-        String url = backendUrl + "/api/comments/" + id;
-    /*    return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
-                .retrieve()
-                .body(CommentDTO.class);
-    }*/
-    
-    return restClient.get()
-            .uri(url)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .body(CommentDTO.class);
+        try {
+            String url = backendUrl + "/api/comments/item/" + id;
+            return jwtInterceptor.addAuthHeader(restClient.get().uri(url).accept(MediaType.APPLICATION_JSON))
+                    .retrieve()
+                    .onStatus(status -> status.value() == 404, (req, res) -> {
+                        throw new RuntimeException("Comment not found with ID: " + id);
+                    })
+                    .body(CommentDTO.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
     // CREATE
     public CommentDTO create(CommentDTO c) {
-        String url = backendUrl + "/api/comments";
-        return jwtInterceptor.addAuthHeader(restClient.post().uri(url).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).body(c))
-                .retrieve()
-                .body(CommentDTO.class);
+        try {
+            String url = backendUrl + "/api/comments";
+            return jwtInterceptor.addAuthHeader(restClient.post().uri(url).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).body(c))
+                    .retrieve()
+                    .body(CommentDTO.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create comment: " + e.getMessage());
+        }
     }
 
     // DELETE
     public void delete(Integer id) {
-        String url = backendUrl + "/api/comments/" + id;
-        jwtInterceptor.addAuthHeader(restClient.delete().uri(url))
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            String url = backendUrl + "/api/comments/item/" + id;
+            jwtInterceptor.addAuthHeader(restClient.delete().uri(url))
+                    .retrieve()
+                    .onStatus(status -> status.value() == 404, (req, res) -> {
+                        throw new RuntimeException("Cannot delete. Comment not found with ID: " + id);
+                    })
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     // GET BY TASK

@@ -17,16 +17,25 @@
 
     <h2 class="mb-3 text-center">📎 Attachment List</h2>
 
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <!-- Filter label (shown when filtering by Task) -->
     <div th:if="${filterLabel}" class="text-center mb-3">
         <span class="badge-filter" th:text="'Filtered by → ' + ${filterLabel}"></span>
     </div>
 
     <!-- Back / Nav -->
-    <div class="mb-3 d-flex gap-2">
+    <div class="mb-3 d-flex gap-2 align-items-center">
         <a href="/attachment" class="btn btn-secondary btn-sm">← Back to Endpoints</a>
         <a href="/attachment/create" class="btn btn-primary btn-sm">+ Add Attachment</a>
         <a href="/attachment/all" class="btn btn-outline-dark btn-sm">All Attachments</a>
+        <div class="ms-auto">
+            <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        </div>
     </div>
 
     <!-- Table -->
@@ -59,6 +68,28 @@
         </tr>
         </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <nav th:if="${totalPages > 0}" aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/attachment/all(page=${currentPage - 1}, size=${size})}">Previous</a>
+            </li>
+
+            <!-- Page Numbers -->
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${pageNum == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/attachment/all(page=${pageNum}, size=${size})}" th:text="${pageNum + 1}"></a>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/attachment/all(page=${currentPage + 1}, size=${size})}">Next</a>
+            </li>
+        </ul>
+        <p class="text-center text-muted small" th:text="'Total Elements: ' + ${totalElements} + ' | Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}"></p>
+    </nav>
 
 </div>
 

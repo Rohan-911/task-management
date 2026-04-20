@@ -26,6 +26,8 @@ public class AuthController {
     @PostMapping("/login-action")
     public String login(@RequestParam String username,
                         @RequestParam String password,
+                        @RequestParam(required = false) String redirect,
+                        @RequestParam(required = false) String loginPage,
                         HttpServletRequest request,
                         Model model) {
 
@@ -40,36 +42,42 @@ public class AuthController {
                     .retrieve()
                     .body(AuthResponseDTO.class);
 
-            System.out.println("LOGIN TOKEN = " + (response != null ? response.getToken() : null));
-
             if (response != null && response.getToken() != null) {
 
                 HttpSession session = request.getSession();
                 session.setAttribute("JWT_TOKEN", response.getToken());
                 session.setAttribute("USERNAME", username);
-
+                session.setAttribute("ROLES", response.getRoles());
+                
                 boolean isAdmin = response.getRoles() != null &&
                         response.getRoles().stream()
-                                .anyMatch(r -> r.equalsIgnoreCase("admin"));
+                                .anyMatch(r -> r.equalsIgnoreCase("admin") || r.equalsIgnoreCase("ROLE_ADMIN"));
 
-                if (isAdmin) {
-                    return "redirect:/admin-dashboard";
-                } else {
-                    return "redirect:/user-dashboard";
+                session.setAttribute("isAdmin", isAdmin);
+
+                if (redirect != null && !redirect.isBlank()) {
+                    return "redirect:" + redirect;
                 }
+
+                return isAdmin ? "redirect:/admin-dashboard" : "redirect:/user-dashboard";
 
             } else {
                 model.addAttribute("error", "Invalid credentials");
-                return "userservice/login"; // ✅ UPDATED
+                return (loginPage != null) ? loginPage : "userservice/login";
             }
-
-        } catch (org.springframework.web.client.HttpStatusCodeException e) {
-            model.addAttribute("error", "Invalid Username or Password");
-            return "userservice/login"; // ✅ UPDATED
 
         } catch (Exception e) {
             model.addAttribute("error", "Login failed: " + e.getMessage());
-            return "userservice/login"; // ✅ UPDATED
+            return (loginPage != null) ? loginPage : "userservice/login";
         }
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return "redirect:/comment/login";
     }
 }

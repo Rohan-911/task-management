@@ -23,6 +23,9 @@
 <div class="form-box">
     <h4 class="form-title">📎 Add Attachment</h4>
 
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <!-- POST /api/attachments -->
     <form method="post" action="/attachment/create" th:object="${attachment}">
 

@@ -1,36 +1,157 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Search by Priority</title>
+
+    <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+
+        .container-box {
+            max-width: 700px;
+            margin: 60px auto;
+        }
+
+        .card-dark {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Input */
+        .form-control {
+            background: #334155;
+            border: none;
+            color: white;
+        }
+
+        .form-control:focus {
+            background: #334155;
+            color: white;
+            box-shadow: none;
+            border: 1px solid #3b82f6;
+        }
+
+        /* Result card */
+        .result-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .result-box p {
+            margin: 5px 0;
+        }
+
+        /* Priority badges */
+        .priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .high {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            border: none;
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
-    <div class="card p-4 shadow">
+<div class="container-box">
+
+    <div class="card-dark">
 
         <h3>Search by Priority</h3>
 
-        <form th:action="@{/tasks/search/priority}" method="get">
-            <select name="priority" class="form-control mb-3">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
+        <!-- 🔍 SEARCH -->
+        <form method="get" th:action="@{/tasks/search/priority}">
+            <div class="input-group mb-3">
+                <span class="input-group-text bg-secondary border-0 text-white">
+                    <i class="bi bi-funnel"></i>
+                </span>
 
-            <button class="btn btn-primary">Search</button>
+                <select name="priority" class="form-control">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+
+                <button class="btn btn-primary">Search</button>
+            </div>
         </form>
 
-        <table class="table mt-3" th:if="${tasks}">
-            <tr th:each="t : ${tasks}">
-                <td th:text="${t.taskID}"></td>
-                <td th:text="${t.taskName}"></td>
-                <td th:text="${t.priority}"></td>
-            </tr>
-        </table>
+        <!-- ✅ RESULTS -->
+        <div th:if="${tasks != null and !tasks.isEmpty()}">
+
+            <div th:each="t : ${tasks}" class="result-box">
+
+                <p><b>ID:</b> <span th:text="${t.taskID}"></span></p>
+                <p><b>Name:</b> <span th:text="${t.taskName}"></span></p>
+
+                <p><b>Priority:</b>
+                    <span th:text="${t.priority}"
+                          th:classappend="
+                            ${t.priority == 'Low'} ? 'priority low' :
+                            (${t.priority == 'Medium'} ? 'priority medium' :
+                            'priority high')
+                          ">
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+        
+        <div th:if="${tasks == null or tasks.isEmpty()}" class="text-center mt-3">
+            <p class="text-danger">No tasks found</p>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="/tasks/task-endpoints" class="btn btn-secondary">Back</a>
+        </div>
 
     </div>
+
 </div>
 
 </body>
