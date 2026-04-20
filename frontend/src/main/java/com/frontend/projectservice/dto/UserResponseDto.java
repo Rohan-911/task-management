@@ -1,4 +1,4 @@
-package com.task.projectservice.dto;
+package com.frontend.projectservice.dto;
 
 import java.util.List;
 
@@ -24,6 +24,10 @@ public class UserResponseDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserName(String userName) {
+        this.username = userName;
     }
 
     public String getEmail() {

@@ -1,4 +1,4 @@
-package com.task.projectservice.dto;
+package com.frontend.projectservice.dto;
 
 public class UserProjectsSearchRequest {
 

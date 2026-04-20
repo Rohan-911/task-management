@@ -1,4 +1,4 @@
-package com.task.projectservice.controller;
+package com.frontend.projectservice.controller;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,21 +17,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
-import com.task.projectservice.dto.AuthResponseDto;
-import com.task.projectservice.dto.ChangeUserRequest;
-import com.task.projectservice.dto.DeleteProjectRequest;
-import com.task.projectservice.dto.LoginRequestDto;
-import com.task.projectservice.dto.ProjectRequestDto;
-import com.task.projectservice.dto.ProjectResponseDto;
-import com.task.projectservice.dto.UserProjectsSearchRequest;
-import com.task.projectservice.dto.UserResponseDto;
+import com.frontend.projectservice.dto.ChangeUserRequest;
+import com.frontend.projectservice.dto.DeleteProjectRequest;
+import com.frontend.projectservice.dto.NotificationResponseDto;
+import com.frontend.projectservice.dto.ProjectRequestDto;
+import com.frontend.projectservice.dto.ProjectResponseDto;
+import com.frontend.projectservice.dto.UserProjectsSearchRequest;
+import com.frontend.projectservice.dto.UserResponseDto;
+import com.frontend.projectservice.service.FrontendNotificationService;
+import com.frontend.projectservice.service.ProjectService;
 
-import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/ui")
@@ -40,70 +39,24 @@ public class ProjectUiController {
 
     private static final int PAGE_SIZE = 10;
     private static final Pattern JSON_FIELD_PATTERN = Pattern.compile("\"([^\"]+)\"\\s*:\\s*\"([^\"]*)\"");
-    private static final String SESSION_TOKEN = "jwtToken";
-    private static final String SESSION_USERNAME = "username";
-    private static final String SESSION_USER_ID = "userId";
+    private static final String SESSION_TOKEN = "JWT_TOKEN";
+    private static final String SESSION_USERNAME = "USERNAME";
+    private static final String LEGACY_SESSION_TOKEN = "jwtToken";
+    private static final String LEGACY_SESSION_USERNAME = "username";
 
-    private final RestClient authRestClient;
+    private final ProjectService projectService;
+    private final FrontendNotificationService frontendNotificationService;
 
-    public ProjectUiController() {
-        this.authRestClient = RestClient.builder()
-                .baseUrl("http://localhost:8080/api/auth")
-                .build();
-    }
-
-    @GetMapping("/login")
-    public String showLoginPage(Model model, HttpSession session) {
-        if (hasToken(session)) {
-            return "redirect:/ui/projects/dashboard";
-        }
-
-        model.addAttribute("loginRequestDto", new LoginRequestDto());
-        return "project-service/login";
-    }
-
-    @PostMapping("/login")
-    public String login(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto,
-                        Model model,
-                        HttpSession session) {
-        if (loginRequestDto.getUsername() == null || loginRequestDto.getUsername().isBlank()) {
-            return showSimpleError(model, "POST", "Username is required.", "400 Bad Request");
-        }
-
-        if (loginRequestDto.getPassword() == null || loginRequestDto.getPassword().isBlank()) {
-            return showSimpleError(model, "POST", "Password is required.", "400 Bad Request");
-        }
-
-        try {
-            AuthResponseDto authResponseDto = authRestClient.post()
-                    .uri("/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(loginRequestDto)
-                    .retrieve()
-                    .body(AuthResponseDto.class);
-
-            if (authResponseDto == null || authResponseDto.getToken() == null || authResponseDto.getToken().isBlank()) {
-                return showSimpleError(model, "POST", "Login failed. Token was not received.", "401 Unauthorized");
-            }
-
-            session.setAttribute(SESSION_TOKEN, authResponseDto.getToken());
-            session.setAttribute(SESSION_USERNAME, loginRequestDto.getUsername());
-            session.setAttribute(SESSION_USER_ID, authResponseDto.getUserId());
-
-            return "redirect:/ui/projects/dashboard";
-        } catch (RestClientResponseException ex) {
-            return showResultError(model, "POST", "Login failed.", ex);
-        } catch (RestClientException ex) {
-            return showSimpleError(model, "POST", "Backend service is not reachable.", "503 Service Unavailable");
-        } catch (Exception ex) {
-            return showSimpleError(model, "POST", ex.getMessage(), "500 Internal Server Error");
-        }
+    public ProjectUiController(ProjectService projectService,
+                               FrontendNotificationService frontendNotificationService) {
+        this.projectService = projectService;
+        this.frontendNotificationService = frontendNotificationService;
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/ui/login";
+        return "redirect:/login";
     }
 
     @GetMapping({"", "/", "/projects/dashboard"})
@@ -113,12 +66,14 @@ public class ProjectUiController {
             return redirect;
         }
 
-        model.addAttribute("username", session.getAttribute(SESSION_USERNAME));
+        model.addAttribute("username", getUsername(session));
         return "project-service/project-api-page";
     }
 
     @PostMapping("/projects/open")
-    public String openProjectById(@ModelAttribute DeleteProjectRequest deleteProjectRequest, Model model, HttpSession session) {
+    public String openProjectById(@ModelAttribute DeleteProjectRequest deleteProjectRequest,
+                                  Model model,
+                                  HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
         if (redirect != null) {
             return redirect;
@@ -248,6 +203,62 @@ public class ProjectUiController {
         return "redirect:/ui/projects/exists/" + deleteProjectRequest.getProjectId();
     }
 
+    @GetMapping("/notifications")
+    public String notificationsPage(Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+
+        prepareNotificationsPage(model, List.of(), false, null);
+        return "project-service/notifications";
+    }
+
+    @PostMapping("/notifications")
+    public String openNotificationsByUser(@ModelAttribute UserProjectsSearchRequest userProjectsSearchRequest,
+                                          Model model,
+                                          HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+
+        if (isInvalidId(userProjectsSearchRequest.getUserId())) {
+            prepareNotificationsPage(model, List.of(), false, "User ID must be a positive number.");
+            return "project-service/notifications";
+        }
+
+        return "redirect:/ui/notifications/user/" + userProjectsSearchRequest.getUserId();
+    }
+
+    @GetMapping("/notifications/user/{userId}")
+    public String getNotificationsByUser(@PathVariable String userId, Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+
+        try {
+            Integer parsedUserId = parseId(userId, "User ID");
+            List<NotificationResponseDto> notifications = frontendNotificationService
+                    .getNotificationsByUser(parsedUserId, getToken(session));
+            prepareNotificationsPage(model, notifications, true, null);
+            return "project-service/notifications";
+        } catch (RestClientResponseException ex) {
+            if (isUnauthorized(ex, session)) {
+                return "redirect:/login";
+            }
+            return showResultError(model, "GET", "Unable to load notifications.", ex);
+        } catch (RestClientException ex) {
+            return showSimpleError(model, "GET", "Backend service is not reachable.");
+        } catch (IllegalArgumentException ex) {
+            prepareNotificationsPage(model, List.of(), false, ex.getMessage());
+            return "project-service/notifications";
+        } catch (Exception ex) {
+            return showSimpleError(model, "GET", ex.getMessage());
+        }
+    }
+
     @GetMapping("/projects/all")
     public String showAllProjects(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
@@ -256,16 +267,11 @@ public class ProjectUiController {
         }
 
         try {
-            List<ProjectResponseDto> projects = projectClient(getToken(session)).get()
-                    .uri("/projects")
-                    .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<List<ProjectResponseDto>>() {
-                    });
-
+            List<ProjectResponseDto> projects = projectService.getAllProjects(getToken(session));
             return buildProjectListPage(model, projects, page, "/ui/projects/all", "All Projects");
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load projects.", ex);
         } catch (RestClientException ex) {
@@ -283,16 +289,11 @@ public class ProjectUiController {
         }
 
         try {
-            List<ProjectResponseDto> projects = projectClient(getToken(session)).get()
-                    .uri("/projects/active")
-                    .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<List<ProjectResponseDto>>() {
-                    });
-
+            List<ProjectResponseDto> projects = projectService.getActiveProjects(getToken(session));
             return buildProjectListPage(model, projects, page, "/ui/projects/active", "Active Projects");
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load active projects.", ex);
         } catch (RestClientException ex) {
@@ -312,16 +313,11 @@ public class ProjectUiController {
         }
 
         try {
-            List<ProjectResponseDto> projects = projectClient(getToken(session)).get()
-                    .uri("/projects/completed")
-                    .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<List<ProjectResponseDto>>() {
-                    });
-
+            List<ProjectResponseDto> projects = projectService.getCompletedProjects(getToken(session));
             return buildProjectListPage(model, projects, page, "/ui/projects/completed", "Completed Projects");
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load completed projects.", ex);
         } catch (RestClientException ex) {
@@ -332,7 +328,9 @@ public class ProjectUiController {
     }
 
     @GetMapping({"/projects/create", "/users/{userId}/projects/create"})
-    public String createProjectForUserForm(@PathVariable(required = false) String userId, Model model, HttpSession session) {
+    public String createProjectForUserForm(@PathVariable(required = false) String userId,
+                                           Model model,
+                                           HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
         if (redirect != null) {
             return redirect;
@@ -389,18 +387,13 @@ public class ProjectUiController {
         }
 
         try {
-            ProjectResponseDto createdProject = projectClient(getToken(session)).post()
-                    .uri("/users/{userId}/projects", projectRequestDto.getUserId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(projectRequestDto)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto createdProject = projectService.createProject(projectRequestDto.getUserId(),
+                    projectRequestDto, getToken(session));
             prepareResultPage(model, true, "POST", "Project created successfully.", null, createdProject, null, null);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             if (hasValidationErrors(ex)) {
                 return showBackendValidationError(model, "POST", ex);
@@ -454,17 +447,13 @@ public class ProjectUiController {
 
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
-            ProjectResponseDto project = projectClient(getToken(session)).get()
-                    .uri("/projects/{projectId}", parsedProjectId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto project = projectService.getProjectById(parsedProjectId, getToken(session));
             model.addAttribute("project", project);
             model.addAttribute("lookupType", "project");
             return "project-service/project-details";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load project details.", ex);
         } catch (RestClientException ex) {
@@ -488,17 +477,12 @@ public class ProjectUiController {
 
         try {
             Integer parsedUserId = parseId(userId, "User ID");
-            List<ProjectResponseDto> projects = projectClient(getToken(session)).get()
-                    .uri("/users/{userId}/projects", parsedUserId)
-                    .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<List<ProjectResponseDto>>() {
-                    });
-
+            List<ProjectResponseDto> projects = projectService.getProjectsByUser(parsedUserId, getToken(session));
             return buildProjectListPage(model, projects, page, "/ui/projects/" + parsedUserId,
                     "Projects For User " + parsedUserId, true);
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load projects for the user.", ex);
         } catch (RestClientException ex) {
@@ -511,23 +495,20 @@ public class ProjectUiController {
     }
 
     @GetMapping("/projects/unassigned")
-    public String showUnassignedProjects(@RequestParam(defaultValue = "1") int page, Model model, HttpSession session) {
+    public String showUnassignedProjects(@RequestParam(defaultValue = "1") int page,
+                                         Model model,
+                                         HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
         if (redirect != null) {
             return redirect;
         }
 
         try {
-            List<ProjectResponseDto> projects = projectClient(getToken(session)).get()
-                    .uri("/projects/unassigned")
-                    .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<List<ProjectResponseDto>>() {
-                    });
-
+            List<ProjectResponseDto> projects = projectService.getUnassignedProjects(getToken(session));
             return buildProjectListPage(model, projects, page, "/ui/projects/unassigned", "Unassigned Projects");
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load unassigned projects.", ex);
         } catch (RestClientException ex) {
@@ -546,17 +527,13 @@ public class ProjectUiController {
 
         try {
             Integer parsedUserId = parseId(userId, "User ID");
-            ProjectResponseDto project = projectClient(getToken(session)).get()
-                    .uri("/users/{userId}/projects/latest", parsedUserId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto project = projectService.getLatestProjectByUser(parsedUserId, getToken(session));
             model.addAttribute("project", project);
             model.addAttribute("lookupType", "latestProject");
             return "project-service/project-details";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load latest project.", ex);
         } catch (RestClientException ex) {
@@ -577,16 +554,12 @@ public class ProjectUiController {
 
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
-            UserResponseDto user = projectClient(getToken(session)).get()
-                    .uri("/projects/{projectId}/user", parsedProjectId)
-                    .retrieve()
-                    .body(UserResponseDto.class);
-
+            UserResponseDto user = projectService.getUserOfProject(parsedProjectId, getToken(session));
             prepareResultPage(model, true, "GET", "User details fetched successfully.", null, null, user, null);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "GET", "Unable to load the project user.", ex);
         } catch (RestClientException ex) {
@@ -607,18 +580,14 @@ public class ProjectUiController {
 
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
-            Boolean exists = projectClient(getToken(session)).get()
-                    .uri("/projects/{projectId}/exists", parsedProjectId)
-                    .retrieve()
-                    .body(Boolean.class);
-
+            Boolean exists = projectService.projectExists(parsedProjectId, getToken(session));
             prepareResultPage(model, true, "GET", "", null, null, null,
                     "Exists: " + Boolean.TRUE.equals(exists));
             prepareProjectExistsSearch(model);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             prepareProjectExistsSearch(model);
             return showResultError(model, "GET", "Unable to check project existence.", ex);
@@ -643,14 +612,11 @@ public class ProjectUiController {
 
         try {
             Integer parsedUserId = parseId(userId, "User ID");
-            Long count = projectClient(getToken(session)).get()
-                    .uri("/users/{userId}/projects/count", parsedUserId)
-                    .retrieve()
-                    .body(Long.class);
-
+            Long count = projectService.getProjectCountByUser(parsedUserId, getToken(session));
             UserResponseDto user = getUserById(parsedUserId, session);
+            ensureUsernameVisible(user, parsedUserId, session);
             String countMessage = "Project Count: " + count;
-            if (user != null && user.getUsername() != null && !user.getUsername().isBlank()) {
+            if (hasVisibleUsername(user)) {
                 countMessage = "Username: " + user.getUsername() + " | " + countMessage;
             }
 
@@ -660,7 +626,7 @@ public class ProjectUiController {
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             prepareCountSearch(model);
             return showResultError(model, "GET", "Unable to count projects for the user.", ex);
@@ -676,6 +642,34 @@ public class ProjectUiController {
         }
     }
 
+    @GetMapping("/projects/edit")
+    public String updateProjectLookupPage(Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+
+        model.addAttribute("deleteProjectRequest", new DeleteProjectRequest());
+        return "project-service/edit-project-search";
+    }
+
+    @PostMapping("/projects/edit")
+    public String openUpdateProjectForm(@ModelAttribute DeleteProjectRequest deleteProjectRequest,
+                                        Model model,
+                                        HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+
+        if (isInvalidId(deleteProjectRequest.getProjectId())) {
+            model.addAttribute("deleteProjectRequest", deleteProjectRequest);
+            return showSimpleError(model, "PUT", "Project ID must be a positive number.", "400 Bad Request");
+        }
+
+        return "redirect:/ui/projects/edit/" + deleteProjectRequest.getProjectId();
+    }
+
     @GetMapping({"/projects/edit/{projectId}", "/projects/{projectId}/edit"})
     public String updateProjectForm(@PathVariable String projectId, Model model, HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
@@ -685,11 +679,7 @@ public class ProjectUiController {
 
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
-            ProjectResponseDto project = projectClient(getToken(session)).get()
-                    .uri("/projects/{projectId}", parsedProjectId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto project = projectService.getProjectById(parsedProjectId, getToken(session));
             ProjectRequestDto projectRequestDto = new ProjectRequestDto();
             projectRequestDto.setProjectId(project.getProjectId());
             projectRequestDto.setProjectName(project.getProjectName());
@@ -703,7 +693,7 @@ public class ProjectUiController {
             return "project-service/edit-project";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "PUT", "Unable to load project for editing.", ex);
         } catch (RestClientException ex) {
@@ -740,18 +730,13 @@ public class ProjectUiController {
         }
 
         try {
-            ProjectResponseDto updatedProject = projectClient(getToken(session)).put()
-                    .uri("/projects/{projectId}", parsedProjectId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(projectRequestDto)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto updatedProject = projectService.updateProject(parsedProjectId, projectRequestDto,
+                    getToken(session));
             prepareResultPage(model, true, "PUT", "Project updated successfully.", null, updatedProject, null, null);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             if (hasValidationErrors(ex)) {
                 return showBackendValidationError(model, "PUT", ex);
@@ -800,17 +785,13 @@ public class ProjectUiController {
 
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
-            ProjectResponseDto updatedProject = projectClient(getToken(session)).patch()
-                    .uri("/projects/{projectId}/user/remove", parsedProjectId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto updatedProject = projectService.removeUserFromProject(parsedProjectId, getToken(session));
             prepareResultPage(model, true, "PATCH", "User removed from project successfully.", null, updatedProject,
                     null, null);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "PATCH", "Unable to remove the user from the project.", ex);
         } catch (RestClientException ex) {
@@ -834,9 +815,9 @@ public class ProjectUiController {
     }
 
     @PostMapping("/projects/change-user")
-    public String changeProjectUserFromForm(@ModelAttribute("changeUserRequest") ChangeUserRequest changeUserRequest,
-                                            Model model,
-                                            HttpSession session) {
+    public String openChangeProjectUser(@ModelAttribute("changeUserRequest") ChangeUserRequest changeUserRequest,
+                                        Model model,
+                                        HttpSession session) {
         String redirect = redirectIfNotLoggedIn(session);
         if (redirect != null) {
             return redirect;
@@ -866,17 +847,14 @@ public class ProjectUiController {
         try {
             Integer parsedProjectId = parseId(projectId, "Project ID");
             Integer parsedUserId = parseId(userId, "User ID");
-            ProjectResponseDto updatedProject = projectClient(getToken(session)).patch()
-                    .uri("/projects/{projectId}/user/{userId}", parsedProjectId, parsedUserId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
+            ProjectResponseDto updatedProject = projectService.changeProjectUser(parsedProjectId, parsedUserId,
+                    getToken(session));
             prepareResultPage(model, true, "PATCH", "Project user changed successfully.", null, updatedProject, null,
                     null);
             return "project-service/result";
         } catch (RestClientResponseException ex) {
             if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
+                return "redirect:/login";
             }
             return showResultError(model, "PATCH", "Unable to change the project user.", ex);
         } catch (RestClientException ex) {
@@ -885,100 +863,6 @@ public class ProjectUiController {
             return showSimpleError(model, "PATCH", ex.getMessage());
         } catch (Exception ex) {
             return showSimpleError(model, "PATCH", ex.getMessage());
-        }
-    }
-
-    @GetMapping("/projects/delete")
-    public String deleteProjectPage(Model model, HttpSession session) {
-        String redirect = redirectIfNotLoggedIn(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        model.addAttribute("deleteProjectRequest", new DeleteProjectRequest());
-        return "project-service/delete-project";
-    }
-
-    @PostMapping("/projects/delete")
-    public String openDeleteProjectPage(@ModelAttribute("deleteProjectRequest") DeleteProjectRequest deleteProjectRequest,
-                                        Model model,
-                                        HttpSession session) {
-        String redirect = redirectIfNotLoggedIn(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        if (isInvalidId(deleteProjectRequest.getProjectId())) {
-            return showSimpleError(model, "DELETE", "Project ID must be a positive number.", "400 Bad Request");
-        }
-
-        return "redirect:/ui/projects/" + deleteProjectRequest.getProjectId() + "/delete";
-    }
-
-    @GetMapping({"/projects/delete/{projectId}/{userId}", "/projects/{projectId}/delete"})
-    public String showDeleteConfirmPage(@PathVariable String projectId,
-                                        @PathVariable(required = false) String userId,
-                                        Model model,
-                                        HttpSession session) {
-        String redirect = redirectIfNotLoggedIn(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        try {
-            Integer parsedProjectId = parseId(projectId, "Project ID");
-            if (userId != null && !userId.isBlank()) {
-                parseId(userId, "User ID");
-            }
-
-            ProjectResponseDto project = projectClient(getToken(session)).get()
-                    .uri("/projects/{projectId}", parsedProjectId)
-                    .retrieve()
-                    .body(ProjectResponseDto.class);
-
-            model.addAttribute("project", project);
-            return "project-service/delete-confirm";
-        } catch (RestClientResponseException ex) {
-            if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
-            }
-            return showResultError(model, "DELETE", "Unable to load project for deletion.", ex);
-        } catch (RestClientException ex) {
-            return showSimpleError(model, "DELETE", "Backend service is not reachable.");
-        } catch (IllegalArgumentException ex) {
-            return showSimpleError(model, "DELETE", ex.getMessage());
-        } catch (Exception ex) {
-            return showSimpleError(model, "DELETE", ex.getMessage());
-        }
-    }
-
-    @PostMapping({"/projects/delete/{projectId}", "/projects/{projectId}/delete"})
-    public String deleteProject(@PathVariable String projectId, Model model, HttpSession session) {
-        String redirect = redirectIfNotLoggedIn(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        try {
-            Integer parsedProjectId = parseId(projectId, "Project ID");
-            projectClient(getToken(session)).delete()
-                    .uri("/projects/{projectId}", parsedProjectId)
-                    .retrieve()
-                    .toBodilessEntity();
-
-            prepareResultPage(model, true, "DELETE", "Project deleted successfully.", null, null, null, null);
-            return "project-service/result";
-        } catch (RestClientResponseException ex) {
-            if (isUnauthorized(ex, session)) {
-                return "redirect:/ui/login";
-            }
-            return showResultError(model, "DELETE", "Project deletion failed.", ex);
-        } catch (RestClientException ex) {
-            return showSimpleError(model, "DELETE", "Backend service is not reachable.");
-        } catch (IllegalArgumentException ex) {
-            return showSimpleError(model, "DELETE", ex.getMessage());
-        } catch (Exception ex) {
-            return showSimpleError(model, "DELETE", ex.getMessage());
         }
     }
 
@@ -1050,43 +934,70 @@ public class ProjectUiController {
         }
     }
 
-    private RestClient projectClient(String token) {
-        return RestClient.builder()
-                .baseUrl("http://localhost:8080/api/v1")
-                .defaultHeader("Authorization", "Bearer " + token)
-                .build();
-    }
-
     private UserResponseDto getUserById(Integer userId, HttpSession session) {
         try {
-            return RestClient.builder()
-                    .baseUrl("http://localhost:8080/api")
-                    .defaultHeader("Authorization", "Bearer " + getToken(session))
-                    .build()
-                    .get()
-                    .uri("/users/{id}", userId)
-                    .retrieve()
-                    .body(UserResponseDto.class);
+            return projectService.getUserById(userId, getToken(session));
         } catch (Exception ex) {
             return null;
         }
     }
 
+    private void ensureUsernameVisible(UserResponseDto user, Integer userId, HttpSession session) {
+        if (user == null || (user.getUsername() != null && !user.getUsername().isBlank())) {
+            return;
+        }
+
+        try {
+            List<ProjectResponseDto> projects = projectService.getProjectsByUser(userId, getToken(session));
+            for (ProjectResponseDto project : projects) {
+                if (project.getUserName() != null && !project.getUserName().isBlank()) {
+                    user.setUsername(project.getUserName());
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            // Keep the fallback simple. We only need a visible value on the page.
+        }
+
+        user.setUsername("Not available");
+    }
+
+    private boolean hasVisibleUsername(UserResponseDto user) {
+        return user != null
+                && user.getUsername() != null
+                && !user.getUsername().isBlank()
+                && !"Not available".equalsIgnoreCase(user.getUsername());
+    }
+
     private String redirectIfNotLoggedIn(HttpSession session) {
         if (!hasToken(session)) {
-            return "redirect:/ui/login";
+            return "redirect:/login";
         }
         return null;
     }
 
     private boolean hasToken(HttpSession session) {
         Object token = session.getAttribute(SESSION_TOKEN);
+        if (!(token instanceof String value) || value.isBlank()) {
+            token = session.getAttribute(LEGACY_SESSION_TOKEN);
+        }
         return token instanceof String value && !value.isBlank();
     }
 
     private String getToken(HttpSession session) {
         Object token = session.getAttribute(SESSION_TOKEN);
+        if (!(token instanceof String value) || value.isBlank()) {
+            token = session.getAttribute(LEGACY_SESSION_TOKEN);
+        }
         return token == null ? null : token.toString();
+    }
+
+    private String getUsername(HttpSession session) {
+        Object username = session.getAttribute(SESSION_USERNAME);
+        if (!(username instanceof String value) || value.isBlank()) {
+            username = session.getAttribute(LEGACY_SESSION_USERNAME);
+        }
+        return username == null ? null : username.toString();
     }
 
     private boolean isUnauthorized(RestClientResponseException ex, HttpSession session) {
@@ -1282,5 +1193,15 @@ public class ProjectUiController {
         model.addAttribute("project", null);
         model.addAttribute("user", null);
         model.addAttribute("extraMessage", null);
+    }
+
+    private void prepareNotificationsPage(Model model,
+                                          List<NotificationResponseDto> notifications,
+                                          boolean hasSearched,
+                                          String formError) {
+        model.addAttribute("notificationSearchRequest", new UserProjectsSearchRequest());
+        model.addAttribute("notifications", notifications == null ? List.of() : notifications);
+        model.addAttribute("hasSearchedNotifications", hasSearched);
+        model.addAttribute("formError", formError);
     }
 }

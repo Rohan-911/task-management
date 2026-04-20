@@ -32,7 +32,6 @@
         .post { color: blue; }
         .put { color: orange; }
         .patch { color: purple; }
-        .delete { color: red; }
         .url { flex: 1; margin-left: 15px; color: #555; }
 
         .section-title { margin-top: 25px; margin-bottom: 10px; font-weight: 600; }
@@ -78,20 +77,8 @@
 
     <div class="endpoint">
         <span class="method get">GET</span>
-        <span class="url">Get Projects By User</span>
-        <a th:href="@{/ui/users/projects}">Open</a>
-    </div>
-
-    <div class="endpoint">
-        <span class="method get">GET</span>
         <span class="url">Get Project By ID</span>
         <a th:href="@{/ui/project}">Open</a>
-    </div>
-
-    <div class="endpoint">
-        <span class="method get">GET</span>
-        <span class="url">Get User of Project</span>
-        <a th:href="@{/ui/projects/user}">Open</a>
     </div>
 
     <div class="endpoint">
@@ -102,20 +89,32 @@
 
     <div class="endpoint">
         <span class="method get">GET</span>
-        <span class="url">Count Projects by User</span>
-        <a th:href="@{/ui/projects/count}">Open</a>
-    </div>
-
-    <div class="endpoint">
-        <span class="method get">GET</span>
         <span class="url">Check Project Exists</span>
         <a th:href="@{/ui/projects/exists}">Open</a>
     </div>
 
     <div class="endpoint">
         <span class="method get">GET</span>
-        <span class="url">Latest Project</span>
+        <span class="url">Get Projects By User</span>
+        <a th:href="@{/ui/users/projects}">Open</a>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">Count Projects by User</span>
+        <a th:href="@{/ui/projects/count}">Open</a>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">Latest Project of User</span>
         <a th:href="@{/ui/projects/latest}">Open</a>
+    </div>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <span class="url">Get User of Project</span>
+        <a th:href="@{/ui/projects/user}">Open</a>
     </div>
 
     <!-- UPDATE -->
@@ -124,7 +123,7 @@
     <div class="endpoint">
         <span class="method put">PUT</span>
         <span class="url">Edit Project (Form)</span>
-        <a th:href="@{/ui/projects/edit/1}">Open</a>
+        <a th:href="@{/ui/projects/edit}">Open</a>
     </div>
 
     <!-- USER MANAGEMENT -->
@@ -142,13 +141,13 @@
         <a th:href="@{/ui/projects/change-user}">Open</a>
     </div>
 
-    <!-- DELETE -->
-    <div class="section-title">Delete</div>
+    <!-- NOTIFICATIONS -->
+    <div class="section-title">Notifications</div>
 
     <div class="endpoint">
-        <span class="method delete">DELETE</span>
-        <span class="url">Delete Project</span>
-        <a th:href="@{/ui/projects/delete/1/1}">Open</a>
+        <span class="method get">GET</span>
+        <span class="url">Get Notifications</span>
+        <a th:href="@{/ui/notifications}">Open</a>
     </div>
 
 </div>

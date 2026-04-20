@@ -1,16 +1,25 @@
-package com.task.projectservice.dto;
+package com.frontend.projectservice.dto;
 
 import java.time.LocalDate;
 
-public class ProjectResponseDto {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public class ProjectRequestDto {
 
     private Integer projectId;
+
+    @NotBlank(message = "Project name is required.")
     private String projectName;
+
     private String description;
+
+    @NotNull(message = "Start date is required.")
     private LocalDate startDate;
+
     private LocalDate endDate;
+
     private Integer userId;
-    private String userName;
 
     public Integer getProjectId() {
         return projectId;
@@ -58,13 +67,5 @@ public class ProjectResponseDto {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 }

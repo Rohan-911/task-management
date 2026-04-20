@@ -6,11 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/")
-    public String home() {
-        return "taskservice/home";   
-    }
-
     @GetMapping("/home")
     public String homePage() {
         return "taskservice/home";   
@@ -28,6 +23,6 @@ public class HomeController {
 
     @GetMapping("/project")
     public String projectPage() {
-        return "taskservice/project-endpoints";   
+        return "redirect:/ui/projects/dashboard";
     }
 }
