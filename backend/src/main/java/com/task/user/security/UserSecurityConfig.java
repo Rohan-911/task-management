@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy; // ⭐ IMPORTANT
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,43 +16,57 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableMethodSecurity
 public class UserSecurityConfig {
 
-    private final JwtFilter jwtFilter;
+	private final JwtFilter jwtFilter;
 
-    public UserSecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
+	public UserSecurityConfig(JwtFilter jwtFilter) {
+		this.jwtFilter = jwtFilter;
+	}
 
-    @Bean
-    public SecurityFilterChain usersecurityFilterChain(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-        .securityMatcher("/api/users/**") 
-            .csrf(csrf -> csrf.disable())
+		http.csrf(csrf -> csrf.disable())
 
-         
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+				// ⭐ Stateless (JWT)
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
-            )
+				.authorizeHttpRequests(auth -> auth
 
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Unauthorized: Invalid or missing token");
-                })
-            )
+					    // ✅ PUBLIC UI PAGES
+					    .requestMatchers(
+					            "/",                  // login page
+					            "/dashboard",
+					            "/admin-dashboard",
+					            "/user-dashboard",
+					            "/users-view",
+					            "/create-user",
+					            "/css/**",
+					            "/js/**"
+					    ).permitAll()
 
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+					    // ✅ LOGIN API
+					    .requestMatchers("/api/auth/**").permitAll()
 
-        return http.build();
-    }
+					    // 🔐 PROTECTED APIs
+					    .requestMatchers("/api/**").authenticated()
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+					    // fallback
+					    .anyRequest().permitAll()
+					)
+
+				.exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.getWriter().write("Unauthorized: Invalid or missing token");
+				}))
+
+				// ⭐ JWT FILTER
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

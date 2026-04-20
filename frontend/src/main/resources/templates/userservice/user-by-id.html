@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <div style="max-width:500px; margin:auto;">
+
+        <h3 style="text-align:center;">Get User By ID</h3>
+
+        <form action="/user-by-id/result" method="get"
+              style="margin-top:20px;">
+
+            <input name="id" placeholder="Enter User ID"
+                   style="width:100%; padding:10px; border-radius:6px;">
+
+            <button style="width:100%; margin-top:10px;
+                           background:#2563eb; color:white;
+                           padding:10px; border:none; border-radius:6px;">
+                Search
+            </button>
+        </form>
+
+        <div th:if="${user}" style="margin-top:20px; background:white;
+                                   padding:20px; border-radius:10px;">
+            <p><b>ID:</b> <span th:text="${user.userId}"></span></p>
+            <p><b>Username:</b> <span th:text="${user.username}"></span></p>
+            <p><b>Email:</b> <span th:text="${user.email}"></span></p>
+        </div>
+
+    </div>
+
+</div>
+</html>
