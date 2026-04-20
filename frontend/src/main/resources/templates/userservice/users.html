@@ -119,13 +119,13 @@
             Showing page <b th:text="${currentPage + 1}"></b> of <b th:text="${totalPages}"></b>
         </div>
         <div style="display:flex; gap:10px;">
-            <a th:if="${currentPage > 0}" th:href="@{'/api/users?page=' + ${currentPage - 1}}" 
+            <a th:if="${currentPage > 0}" th:href="@{'/api/users?page=' + ${currentPage - 1} + '&size=' + ${pageSize}}" 
                style="padding:8px 16px; background:white; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s;"
                onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='white';">
                 Previous
             </a>
             
-            <a th:if="${currentPage < totalPages - 1}" th:href="@{'/api/users?page=' + ${currentPage + 1}}" 
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{'/api/users?page=' + ${currentPage + 1} + '&size=' + ${pageSize}}" 
                style="padding:8px 16px; background:white; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s;"
                onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='white';">
                 Next
@@ -283,7 +283,7 @@
 }
 </style>
 
-<script>
+<script th:inline="javascript">
     // Dropdown toggle logic
     function toggleDropdown(btn) {
         document.querySelectorAll('.dropdown-container.active').forEach(container => {
@@ -306,21 +306,8 @@
     // Toggle Admin/User specific views
     document.addEventListener("DOMContentLoaded", function() {
         try {
-            const rolesRaw = localStorage.getItem("roles");
-            let roles = [];
-            if (rolesRaw && rolesRaw !== "undefined" && rolesRaw !== "null") {
-                roles = JSON.parse(rolesRaw);
-            }
-            
-            // Ensure roles is an array
-            if (!Array.isArray(roles)) {
-                if (typeof roles === 'string') roles = [roles];
-                else roles = [];
-            }
-            
-            console.log("Detected roles:", roles);
-
-            const isAdmin = roles.some(r => r && typeof r === 'string' && r.toUpperCase().includes("ADMIN"));
+            const roles = /*[[${session.ROLES}]]*/ [];
+            const isAdmin = /*[[${session.isAdmin == true}]]*/ false;
 
             // Debug element to show current view mode
             const debugHeader = document.createElement('div');

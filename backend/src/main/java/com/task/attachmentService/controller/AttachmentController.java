@@ -27,14 +27,26 @@ public class AttachmentController {
         return service.getAll();
     }
 
+    // GET PAGINATED
+    @GetMapping("/list/all")
+    public org.springframework.data.domain.Page<Attachment> getAllPaginated(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size) {
+        return service.getAllPaginated(org.springframework.data.domain.PageRequest.of(page, size));
+    }
+
     // GET BY ID
-    @GetMapping("/{id}")
-    public Attachment getById(@PathVariable Integer id) {
-        return service.getById(id);
+    @GetMapping("/item/{id:[0-9]+}")
+    public org.springframework.http.ResponseEntity<Attachment> getById(@PathVariable Integer id) {
+        Attachment a = service.getById(id);
+        if (a == null) {
+            return org.springframework.http.ResponseEntity.notFound().build();
+        }
+        return org.springframework.http.ResponseEntity.ok(a);
     }
 
     // DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/item/{id:[0-9]+}")
     public String delete(@PathVariable Integer id) {
         service.delete(id);
         return "Attachment deleted successfully";

@@ -222,8 +222,13 @@
             </form>
         </div>
         <div th:if="${session.jwtToken != null}">
+
+            <span class="auth-status">Authenticated ✓</span>
+            <a href="/notification/logout" class="btn btn-logout">Logout</a>
+
             <span class="auth-status" th:text="'Authenticated as ' + ${session.USERNAME} + ' ✓'">Authenticated ✓</span>
             <a th:href="@{/category/logout}" class="btn btn-logout">Logout</a>
+
         </div>
     </div>
 

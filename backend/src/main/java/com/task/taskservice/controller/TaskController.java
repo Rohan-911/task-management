@@ -27,7 +27,6 @@ public class TaskController {
         return service.getAllTasks();
     }
 
-    
     @GetMapping("/{id}")
     public Task getTask(@PathVariable Integer id) {
         return service.getTaskById(id);

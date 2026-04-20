@@ -17,7 +17,10 @@ public class JwtInterceptor {
 
         if (attr != null) {
             HttpServletRequest request = attr.getRequest();
-            String token = (String) request.getSession().getAttribute("jwtToken");
+            String token = (String) request.getSession().getAttribute("JWT_TOKEN");
+            if (token == null || token.isBlank()) {
+                token = (String) request.getSession().getAttribute("jwtToken");
+            }
 
             System.out.println("INTERCEPTOR TOKEN = " + token); 
 

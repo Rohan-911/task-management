@@ -16,24 +16,48 @@ public class CommentService {
     @Autowired
     private CommentRepository repo;
     
-    // CREATE
+    @jakarta.transaction.Transactional
     public Comment save(Comment c) {
-        c.setCreatedAt(new Date());
+        // get max ID from DB
+        Integer maxId = repo.findMaxId();
+        
+        if (maxId == null) {
+            c.setCommentID(1);
+        } else {
+            c.setCommentID(maxId + 1);
+        }
+
+        if (c.getCreatedAt() == null) {
+            c.setCreatedAt(new Date());
+        }
+
+        System.out.println("Saving Comment with ID: " + c.getCommentID() + " for Task: " + c.getTaskID());
+        
         return repo.save(c);
     }
+
     
     // GET BY ID
     public Comment getById(Integer id) {
-        return repo.findById(id).orElse(null);
+        return repo.findById(id)
+                .orElseThrow(() -> new com.task.exception.CommentNotFoundException("Comment not found with ID: " + id));
     }
     
     // GET ALL
     public List<Comment> getAll() {
-    return repo.findAll();
+        return repo.findAll();
+    }
+
+    // GET PAGINATED
+    public org.springframework.data.domain.Page<Comment> getAllPaginated(org.springframework.data.domain.Pageable pageable) {
+        return repo.findAll(pageable);
     }
     
     // DELETE
     public void delete(Integer id) {
+        if (!repo.existsById(id)) {
+            throw new com.task.exception.CommentNotFoundException("Cannot delete. Comment not found with ID: " + id);
+        }
         repo.deleteById(id);
     }
     

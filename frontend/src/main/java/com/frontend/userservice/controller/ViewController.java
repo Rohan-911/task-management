@@ -12,6 +12,7 @@ import com.frontend.userservice.dto.UserRequestDTO;
 import com.frontend.userservice.dto.UserResponseDTO;
 import com.frontend.userservice.service.FrontendUserService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -21,6 +22,19 @@ public class ViewController {
 
     public ViewController(FrontendUserService userService) {
         this.userService = userService;
+    }
+
+    private boolean isLoggedIn(HttpSession session) {
+        return session != null &&
+                (session.getAttribute("JWT_TOKEN") != null || session.getAttribute("jwtToken") != null);
+    }
+
+    private boolean isAdmin(HttpSession session) {
+        return session != null && Boolean.TRUE.equals(session.getAttribute("isAdmin"));
+    }
+
+    private String redirectIfNotLoggedIn(HttpSession session) {
+        return isLoggedIn(session) ? null : "redirect:/login";
     }
 
 
@@ -40,8 +54,8 @@ public class ViewController {
 
     @GetMapping("/login")
 
-    public String home() {
-        return "userservice/login";
+    public String home(HttpSession session) {
+        return isLoggedIn(session) ? "redirect:/dashboard" : "userservice/login";
     }
 
     @PostMapping("/logout")
@@ -54,17 +68,32 @@ public class ViewController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
-        return "userservice/dashboard";
+    public String dashboard(HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        return isAdmin(session) ? "redirect:/admin-dashboard" : "redirect:/user-dashboard";
     }
 
     @GetMapping("/admin-dashboard")
-    public String adminDashboard() {
+    public String adminDashboard(HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         return "userservice/admin-dashboard";
     }
 
     @GetMapping("/user-dashboard")
-    public String userDashboard() {
+    public String userDashboard(HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         return "userservice/user-dashboard";
     }
 
@@ -73,9 +102,13 @@ public class ViewController {
     @GetMapping("/api/users")
     public String usersPage(Model model,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(required = false) String success) {
-
-        int size = 10;
+                           @RequestParam(defaultValue = "10") int size,
+                           @RequestParam(required = false) String success,
+                           HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
 
         try {
             Page<UserResponseDTO> userPage = userService.getAllUsers(page, size);
@@ -90,6 +123,7 @@ public class ViewController {
         }
 
         model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
 
         if (success != null) {
             model.addAttribute("success", success);
@@ -101,7 +135,14 @@ public class ViewController {
     // ================= CREATE =================
 
     @GetMapping("/api/users/new")
-    public String createUserPage(Model model) {
+    public String createUserPage(Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         model.addAttribute("userRequestDTO", new UserRequestDTO());
         return "userservice/create-user";
     }
@@ -109,7 +150,15 @@ public class ViewController {
     @PostMapping("/api/users")
     public String createUser(@Valid UserRequestDTO dto,
                              BindingResult result,
-                             Model model) {
+                             Model model,
+                             HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
 
         model.addAttribute("userRequestDTO", dto);
 
@@ -132,7 +181,15 @@ public class ViewController {
     @GetMapping({"/api/users/edit", "/api/users/{id}/edit"})
     public String updateUserByIdPage(@PathVariable(required = false) Integer id,
                                      Model model,
-                                     @RequestParam(required = false) String success) {
+                                     @RequestParam(required = false) String success,
+                                     HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         if (success != null) model.addAttribute("success", success);
 
         if (id != null) {
@@ -156,7 +213,15 @@ public class ViewController {
     public String updateUser(@PathVariable Integer id,
                              @Valid @ModelAttribute("user") UserRequestDTO dto,
                              BindingResult result,
-                             Model model) {
+                             Model model,
+                             HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
 
         if (result.hasErrors()) {
             return "userservice/update-user";
@@ -178,7 +243,15 @@ public class ViewController {
     @GetMapping({"/api/users/delete", "/api/users/{id}/delete"})
     public String deleteUserByIdPage(@PathVariable(required = false) Integer id,
                                      Model model,
-                                     @RequestParam(required = false) String success) {
+                                     @RequestParam(required = false) String success,
+                                     HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         if (success != null) model.addAttribute("success", success);
 
         if (id != null) {
@@ -193,7 +266,14 @@ public class ViewController {
     }
 
     @PostMapping("/api/users/delete-action")
-    public String deleteUserAction(@RequestParam Integer id) {
+    public String deleteUserAction(@RequestParam Integer id, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         try {
             userService.deleteUser(id);
             return "redirect:/api/users/delete?success=User+" + id + "+deleted";
@@ -203,7 +283,14 @@ public class ViewController {
     }
 
     @PostMapping("/api/users/{id}/delete")
-    public String deleteUser(@PathVariable Integer id) {
+    public String deleteUser(@PathVariable Integer id, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         try {
             userService.deleteUser(id);
             return "redirect:/api/users?success=Deleted";
@@ -217,7 +304,12 @@ public class ViewController {
     @GetMapping("/api/users/search")
     public String searchUser(@RequestParam(required = false) String username,
                              @RequestParam(defaultValue = "0") int page,
-                             Model model) {
+                             Model model,
+                             HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         if (username == null || username.isBlank()) {
             return "userservice/user-search";
         }
@@ -241,7 +333,12 @@ public class ViewController {
     @GetMapping({"/api/users/find", "/api/users/{id}"})
     public String getUserById(@PathVariable(required = false) Integer id,
                               @RequestParam(required = false, name = "id") Integer paramId,
-                              Model model) {
+                              Model model,
+                              HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         if (id == null && paramId != null) {
             return "redirect:/api/users/" + paramId;
         }
@@ -263,7 +360,12 @@ public class ViewController {
     @GetMapping("/api/users/role")
     public String roleFilter(@RequestParam(required = false) String role,
                              @RequestParam(defaultValue = "0") int page,
-                             Model model) {
+                             Model model,
+                             HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         if (role == null || role.isBlank()) {
             return "userservice/user-role";
         }
@@ -285,7 +387,11 @@ public class ViewController {
     // ================= ROLES =================
 
     @GetMapping("/api/roles")
-    public String rolesPage(Model model) {
+    public String rolesPage(Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         try {
             model.addAttribute("roles", userService.getAllRoles());
         } catch (Exception e) {
@@ -299,7 +405,12 @@ public class ViewController {
     @GetMapping({"/api/users/roles", "/api/users/{id}/roles"})
     public String getUserRoles(@PathVariable(required = false) Integer id,
                                @RequestParam(required = false, name = "id") Integer paramId,
-                               Model model) {
+                               Model model,
+                               HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         if (id == null && paramId != null) {
             return "redirect:/api/users/" + paramId + "/roles";
         }
@@ -321,7 +432,15 @@ public class ViewController {
     @GetMapping({"/api/users/assign-roles", "/api/users/{id}/assign-roles"})
     public String assignRolesByIdPage(@PathVariable(required = false) Integer id,
                                       Model model,
-                                      @RequestParam(required = false) String success) {
+                                      @RequestParam(required = false) String success,
+                                      HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         if (success != null) model.addAttribute("success", success);
         
         try {
@@ -343,7 +462,15 @@ public class ViewController {
 
     @PostMapping("/api/users/{id}/assign-roles")
     public String assignRolesAction(@PathVariable Integer id,
-                                    @RequestParam(required = false) List<String> roles) {
+                                    @RequestParam(required = false) List<String> roles,
+                                    HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/user-dashboard?error=Access denied";
+        }
         try {
             if (roles == null) roles = List.of();
             userService.assignRolesToUser(id, roles);
@@ -356,7 +483,11 @@ public class ViewController {
     // ================= MY PROFILE =================
 
     @GetMapping("/api/users/me")
-    public String myProfile(Model model, @RequestParam(required = false) String success) {
+    public String myProfile(Model model, @RequestParam(required = false) String success, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         if (success != null) {
             model.addAttribute("success", success);
         }
@@ -377,7 +508,11 @@ public class ViewController {
     }
 
     @PostMapping("/api/users/me")
-    public String updateMyProfile(@ModelAttribute("user") UserRequestDTO dto, Model model) {
+    public String updateMyProfile(@ModelAttribute("user") UserRequestDTO dto, Model model, HttpSession session) {
+        String redirect = redirectIfNotLoggedIn(session);
+        if (redirect != null) {
+            return redirect;
+        }
         try {
             if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
                 dto.setPassword(null); // Leave password unchanged in backend

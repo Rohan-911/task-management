@@ -1,11 +1,11 @@
 package com.task.taskservice.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.task.exception.DuplicateResourceException;
 import com.task.exception.ResourceNotFoundException;
 import com.task.taskservice.entity.Task;
 import com.task.taskservice.repository.TaskRepository;
@@ -16,131 +16,80 @@ public class TaskService {
     @Autowired
     private TaskRepository repo;
 
-    // ✅ CREATE
     public Task createTask(Task task) {
-        if (repo.existsById(task.getTaskID())) {
-            throw new DuplicateResourceException("Task with ID already exists");
-        }
         return repo.save(task);
     }
 
-    // ✅ GET ALL
     public List<Task> getAllTasks() {
-        List<Task> tasks = repo.findAll();
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found");
-        }
-
-        return tasks;
+        return repo.findAll();
     }
 
-    // ✅ GET BY ID
     public Task getTaskById(Integer id) {
         return repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        		.orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
     }
 
-    // ✅ UPDATE
+   
+
     public Task updateTask(Integer id, Task updatedTask) {
-
         Task task = repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        		.orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
 
-        task.setTaskName(updatedTask.getTaskName());
-        task.setDescription(updatedTask.getDescription());
-        task.setStatus(updatedTask.getStatus());
-        task.setPriority(updatedTask.getPriority());
-        task.setDueDate(updatedTask.getDueDate());
-        task.setUserID(updatedTask.getUserID());
-        task.setProjectID(updatedTask.getProjectID());
 
-        return repo.save(task);
-    }
+            task.setTaskName(updatedTask.getTaskName());
+            task.setDescription(updatedTask.getDescription());
+            task.setStatus(updatedTask.getStatus());
+            task.setPriority(updatedTask.getPriority());
+            task.setDueDate(updatedTask.getDueDate());
+            task.setUserID(updatedTask.getUserID());
+            task.setProjectID(updatedTask.getProjectID());
+            
 
-    // ✅ DELETE
-    public void deleteTask(Integer id) {
-        if (!repo.existsById(id)) {
-            throw new ResourceNotFoundException("Task not found with id: " + id);
+            return repo.save(task);
         }
+
+        
+
+    
+    public void deleteTask(Integer id) {
         repo.deleteById(id);
     }
 
-    // ✅ PRIORITY
     public List<Task> getTasksByPriority(String priority) {
-        List<Task> tasks = repo.findByPriority(priority);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found with priority: " + priority);
-        }
-
-        return tasks;
+        return repo.findByPriority(priority);
     }
 
-    // ✅ STATUS
+    
     public List<Task> getTasksByStatus(String status) {
-        List<Task> tasks = repo.findByStatus(status);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found with status: " + status);
-        }
-
-        return tasks;
+        return repo.findByStatus(status);
     }
 
-    // ✅ USER
+   
     public List<Task> getTasksByUser(Integer userId) {
-        List<Task> tasks = repo.findByUserID(userId);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found for userId: " + userId);
-        }
-
-        return tasks;
+        return repo.findByUserID(userId);
     }
 
-    // ✅ PROJECT
+    
     public List<Task> getTasksByProject(Integer projectId) {
-        List<Task> tasks = repo.findByProjectID(projectId);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found for projectId: " + projectId);
-        }
-
-        return tasks;
+        return repo.findByProjectID(projectId);
     }
 
-    // ✅ SEARCH
+    
+    
+
+    
     public List<Task> searchTasks(String name) {
-        List<Task> tasks = repo.findByTaskNameContaining(name);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException("No tasks found with name: " + name);
-        }
-
-        return tasks;
+        return repo.findByTaskNameContaining(name);
     }
 
-    // ✅ FILTER
+    
     public List<Task> getTasksByStatusAndPriority(String status, String priority) {
-        List<Task> tasks = repo.findByStatusAndPriority(status, priority);
-
-        if (tasks.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "No tasks found with status: " + status + " and priority: " + priority);
-        }
-
-        return tasks;
+        return repo.findByStatusAndPriority(status, priority);
     }
 
-    // ✅ COUNT
+   
     public long countTasksByStatus(String status) {
-        long count = repo.countByStatus(status);
-
-        if (count == 0) {
-            throw new ResourceNotFoundException("No tasks found with status: " + status);
-        }
-
-        return count;
+        return repo.countByStatus(status);
     }
 }
+    

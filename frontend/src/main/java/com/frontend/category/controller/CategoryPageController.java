@@ -66,13 +66,13 @@ public class CategoryPageController {
         return "redirect:/category/";
     }
 
-    @GetMapping("/logout")
+    @GetMapping({"/logout", "/notification/logout"})
     public String logout(jakarta.servlet.http.HttpServletRequest request) {
         request.getSession().invalidate();
         return "redirect:/category/";
     }
 
-    @GetMapping("/")
+    @GetMapping({"", "/", "/notification"})
     public String home() {
         return "CategoryService/Category";
     }

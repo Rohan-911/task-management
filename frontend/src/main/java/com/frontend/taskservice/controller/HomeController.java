@@ -24,6 +24,6 @@ public class HomeController {
 
     @GetMapping("/project")
     public String projectPage() {
-        return "taskservice/project-endpoints";   
+        return "redirect:/ui/projects/dashboard";
     }
 }
