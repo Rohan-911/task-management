@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>API Input Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        h2 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #5f6368;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #3c4043;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #5f6368;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2 th:text="${apiTitle}">API Action</h2>
+    <p th:text="${apiPath}">Static API Path</p>
+
+    <form th:action="${actionUrl}" th:method="${method}" autocomplete="off">
+        <div th:each="field : ${fields}" class="input-group">
+            <label th:for="${field.name}" th:text="${field.label}">Label</label>
+            <input th:type="${field.type}" th:id="${field.name}" th:name="${field.name}" th:placeholder="${field.placeholder}" required autocomplete="off"/>
+        </div>
+        <button type="submit">Execute API</button>
+    </form>
+
+    <a href="/" class="back-link">← Back to Dashboard</a>
+</div>
+
+<script th:if="${isDynamicPath}">
+    // Script to handle dynamic URL construction for RESTful paths if needed
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let action = this.getAttribute('action');
+        if (action.includes('{')) {
+            e.preventDefault();
+            const inputs = this.querySelectorAll('input');
+            inputs.forEach(input => {
+                action = action.replace('{' + input.name + '}', input.value);
+            });
+            window.location.href = action;
+        }
+    });
+</script>
+
+</body>
+</html>

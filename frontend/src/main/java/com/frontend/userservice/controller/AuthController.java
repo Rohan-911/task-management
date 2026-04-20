@@ -26,6 +26,7 @@ public class AuthController {
     @PostMapping("/login-action")
     public String login(@RequestParam String username,
                         @RequestParam String password,
+                        @RequestParam(required = false) String redirect, 
                         HttpServletRequest request,
                         Model model) {
 
@@ -47,7 +48,14 @@ public class AuthController {
                 HttpSession session = request.getSession();
                 session.setAttribute("JWT_TOKEN", response.getToken());
                 session.setAttribute("USERNAME", username);
+                
+                session.setAttribute("ROLES", response.getRoles());
+                
+                if (redirect != null && !redirect.isBlank()) {
+                    return "redirect:" + redirect;
+                }
 
+                // THEN role logic
                 boolean isAdmin = response.getRoles() != null &&
                         response.getRoles().stream()
                                 .anyMatch(r -> r.equalsIgnoreCase("admin"));
@@ -60,16 +68,16 @@ public class AuthController {
 
             } else {
                 model.addAttribute("error", "Invalid credentials");
-                return "userservice/login"; // ✅ UPDATED
+                return "userservice/login"; 
             }
 
         } catch (org.springframework.web.client.HttpStatusCodeException e) {
             model.addAttribute("error", "Invalid Username or Password");
-            return "userservice/login"; // ✅ UPDATED
+            return "userservice/login";
 
         } catch (Exception e) {
             model.addAttribute("error", "Login failed: " + e.getMessage());
-            return "userservice/login"; // ✅ UPDATED
+            return "userservice/login";
         }
     }
 }
