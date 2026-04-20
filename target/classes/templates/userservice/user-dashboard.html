@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <!-- HEADER -->
+    <div style="text-align:center; margin-bottom:30px;">
+        <h2 style="font-weight:700; color:#1e293b;">
+            <span style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);
+                         -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+                User Dashboard
+            </span>
+        </h2>
+
+        <div style="margin-top:12px; display:flex; justify-content:center;
+                    align-items:center; gap:12px; flex-wrap:wrap;">
+
+            <span style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);
+                         color:white; padding:5px 14px; border-radius:20px;
+                         font-size:13px; font-weight:600; letter-spacing:0.5px;">
+                👤 USER
+            </span>
+
+            <span id="userUsername"
+                  style="color:#475569; font-weight:500;"
+                  th:text="'Welcome, ' + ${session.USERNAME}"></span>
+
+            <span style="color:#16a34a; font-weight:600;">
+                Authenticated ✔
+            </span>
+
+            <form th:action="@{/logout}" method="post" style="margin: 0; display: inline-block;">
+                <button type="submit"
+                   style="background:linear-gradient(135deg,#dc2626,#b91c1c);
+                          color:white; padding:6px 16px; border-radius:8px;
+                          text-decoration:none; font-weight:500; font-size:14px;
+                          border:none; cursor:pointer;
+                          transition:transform 0.2s;"
+                   onmouseover="this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- INFO BANNER -->
+    <div style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);
+                border:1px solid #bae6fd; border-radius:10px;
+                padding:14px 20px; margin-bottom:25px; text-align:center;">
+        <span style="color:#0369a1; font-size:14px;">
+            ℹ️ You have <strong>User</strong> access. Contact an admin for elevated permissions.
+        </span>
+    </div>
+
+    <!-- ==================== USER APIs ==================== -->
+    <div style="margin-bottom:30px;">
+        <h4 style="color:#1e293b; margin-bottom:12px;
+                   border-left:4px solid #0ea5e9; padding-left:12px;">
+            🔗 Available APIs
+        </h4>
+
+        <div style="background:white; border-radius:12px;
+                    box-shadow:0 4px 15px rgba(0,0,0,0.08); overflow:hidden;">
+
+            <table style="width:100%; text-align:center; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:linear-gradient(135deg,#0c4a6e,#075985);">
+                        <th style="color:white; padding:14px; font-weight:600;">Method</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Endpoint</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Action</th>
+                        <th style="color:white; padding:14px; font-weight:600;">Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr class="api-row">
+                        <td><span class="method-badge method-post">POST</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/login" class="endpoint-link">/api/login</a></td>
+                        <td><a href="/login" class="action-btn">Open</a></td>
+                        <td class="desc">User Login</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users" class="endpoint-link">/api/users</a></td>
+                        <td><a href="/api/users" class="action-btn">View</a></td>
+                        <td class="desc">Get all users</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users/find" class="endpoint-link">/api/users/{id}</a></td>
+                        <td><a href="/api/users/find" class="action-btn">Try</a></td>
+                        <td class="desc">Get user by ID</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users/me" class="endpoint-link">/api/users/me</a></td>
+                        <td><a href="/api/users/me" class="action-btn">View</a></td>
+                        <td class="desc">Current logged-in user</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users/search" class="endpoint-link">/api/users/search</a></td>
+                        <td><a href="/api/users/search" class="action-btn">Search</a></td>
+                        <td class="desc">Search user</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users/role" class="endpoint-link">/api/users/role</a></td>
+                        <td><a href="/api/users/role" class="action-btn">Filter</a></td>
+                        <td class="desc">Filter by role</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/users/roles" class="endpoint-link">/api/users/{id}/roles</a></td>
+                        <td><a href="/api/users/roles" class="action-btn">View</a></td>
+                        <td class="desc">Get user roles</td>
+                    </tr>
+
+                    <tr class="api-row">
+                        <td><span class="method-badge method-get">GET</span></td>
+                        <td class="endpoint" style="padding:0;"><a href="/api/roles" class="endpoint-link">/api/roles</a></td>
+                        <td><a href="/api/roles" class="action-btn">View</a></td>
+                        <td class="desc">Get all roles</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<style>
+/* === TABLE ROWS === */
+.api-row {
+    transition: background 0.2s;
+}
+.api-row:hover {
+    background: #f8fafc;
+}
+.api-row td {
+    padding: 14px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+/* === METHOD BADGES === */
+.method-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+    text-align: center;
+}
+.method-get     { background:#dbeafe; color:#1d4ed8; }
+.method-post    { background:#dcfce7; color:#15803d; }
+
+/* === ENDPOINT TEXT === */
+.endpoint {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #334155;
+    font-size: 13px;
+}
+.endpoint-link {
+    display: block;
+    padding: 14px 10px;
+    color: inherit;
+    text-decoration: none;
+}
+.endpoint-link:hover {
+    text-decoration: underline;
+}
+
+/* === DESCRIPTION === */
+.desc {
+    color: #64748b;
+}
+
+/* === ACTION BUTTONS === */
+.action-btn {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    min-width: 80px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14,165,233,0.35);
+}
+</style>
+
+</div>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Comment Module</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #eef2f7, #f8fafc);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        /* HEADER */
+        .page-title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1e293b;
+        }
+
+        /* SECTION CARD */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #334155;
+        }
+
+        /* ENDPOINT ROW */
+        .endpoint {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 10px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .endpoint:hover {
+            background: #f1f5f9;
+        }
+
+        /* METHOD BADGE */
+        .method {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            padding: 5px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .get    { background: #dcfce7; color: #166534; }
+        .post   { background: #dbeafe; color: #1d4ed8; }
+        .delete { background: #fee2e2; color: #991b1b; }
+
+        /* ENDPOINT TEXT */
+        .endpoint-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .endpoint-info small {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* BUTTONS */
+        .btn-sm {
+            border-radius: 8px;
+            padding: 5px 12px;
+        }
+
+        .btn-open   { background: #22c55e; color: white; }
+        .btn-test   { background: #3b82f6; color: white; }
+        .btn-danger-sm { background: #ef4444; color: white; }
+    </style>
+</head>
+
+<body>
+
+<div class="container-box">
+
+    <h3 class="page-title">💬 Comment Service APIs</h3>
+
+    <!-- CREATE -->
+    <div class="section">
+        <div class="section-title">Create Comment</div>
+
+        <div class="endpoint">
+            <div class="method post">POST</div>
+            <div class="endpoint-info">
+                Add New Comment
+                <small>/api/comments</small>
+            </div>
+            <a href="/comment/create" class="btn btn-open btn-sm">Open</a>
+        </div>
+    </div>
+
+    <!-- FETCH -->
+    <div class="section">
+        <div class="section-title">Fetch Comments</div>
+
+        <!-- GET ALL -->
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                All Comments
+                <small>/api/comments</small>
+            </div>
+            <a href="/comment/all" class="btn btn-test btn-sm">Open</a>
+        </div>
+
+        <!-- GET BY ID -->
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Comment By ID
+                <small>/api/comments/{id}</small>
+            </div>
+            <a href="/comment/id?id=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <!-- GET BY TASK -->
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Comments By Task
+                <small>/api/comments/task/{taskId}</small>
+            </div>
+            <a href="/comment/task?taskId=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <!-- GET BY USER -->
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Comments By User
+                <small>/api/comments/user/{userId}</small>
+            </div>
+            <a href="/comment/user?userId=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+    </div>
+
+    <!-- DELETE COMMENT -->
+    <div class="section">
+        <div class="section-title">Delete Comment</div>
+
+        <div class="endpoint">
+            <div class="method delete">DELETE</div>
+            <div class="endpoint-info">
+                Delete Comment By ID
+                <small>/api/comments/{id}</small>
+            </div>
+            <a href="/comment/all" class="btn btn-danger-sm btn-sm">Open List</a>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- ATTACHMENT SERVICE APIs                        -->
+    <!-- ============================================== -->
+
+    <h3 class="page-title mt-5">📎 Attachment Service APIs</h3>
+
+    <!-- CREATE ATTACHMENT -->
+    <div class="section">
+        <div class="section-title">Create Attachment</div>
+
+        <div class="endpoint">
+            <div class="method post">POST</div>
+            <div class="endpoint-info">
+                Add New Attachment
+                <small>/api/attachments</small>
+            </div>
+            <a href="/attachment/create" class="btn btn-open btn-sm">Open</a>
+        </div>
+    </div>
+
+    <!-- FETCH ATTACHMENTS -->
+    <div class="section">
+        <div class="section-title">Fetch Attachments</div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                All Attachments
+                <small>/api/attachments</small>
+            </div>
+            <a href="/attachment/all" class="btn btn-test btn-sm">Open</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Attachment By ID
+                <small>/api/attachments/{id}</small>
+            </div>
+            <a href="/attachment/id?id=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Attachments By Task
+                <small>/api/attachments/task/{taskId}</small>
+            </div>
+            <a href="/attachment/task?taskId=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Count Attachments By Task
+                <small>/api/attachments/count/{taskId}</small>
+            </div>
+            <a href="/attachment/count?taskId=1" class="btn btn-count btn-sm">Test</a>
+        </div>
+    </div>
+
+    <!-- DELETE ATTACHMENTS -->
+    <div class="section">
+        <div class="section-title">Delete Attachments</div>
+
+        <div class="endpoint">
+            <div class="method delete">DELETE</div>
+            <div class="endpoint-info">
+                Delete By ID
+                <small>/api/attachments/{id}</small>
+            </div>
+            <a href="/attachment/all" class="btn btn-danger-sm btn-sm">Open List</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method delete">DELETE</div>
+            <div class="endpoint-info">
+                Delete All By Task
+                <small>/api/attachments/task/{taskId}</small>
+            </div>
+            <a href="/attachment/delete/task?taskId=1" class="btn btn-danger-sm btn-sm"
+               onclick="return confirm('Delete all attachments for task 1?')">Test</a>
+        </div>
+    </div>
+
+    <!-- BACK -->
+    <div class="text-center mt-4">
+        <a href="/home" class="btn btn-secondary">← Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>

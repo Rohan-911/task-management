@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <div style="max-width:500px; margin:auto;">
+
+        <h3 style="text-align:center; color:#1e293b; font-weight:700;">Assign Roles By ID</h3>
+
+        <div th:if="${success}" style="background:#dcfce7; color:#15803d; padding:12px 20px; border-radius:8px; margin-top:20px; border-left:4px solid #22c55e;">
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" style="background:#fee2e2; color:#b91c1c; padding:12px 20px; border-radius:8px; margin-top:20px; border-left:4px solid #ef4444;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{${user != null ? '/api/users/' + user.userId + '/assign-roles' : '#'}}" method="post"
+              style="margin-top:20px; background:white; padding:25px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+
+            <div style="margin-bottom:20px;">
+                <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:5px; display:block;">Enter User ID</label>
+                <div style="display:flex; gap:10px;">
+                    <input id="userIdInput" name="id" type="number" required placeholder="e.g. 1"
+                           th:value="${user != null ? user.userId : ''}"
+                           th:readonly="${user != null}"
+                           style="flex:1; padding:10px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;"
+                           th:styleappend="${user != null ? 'background:#f1f5f9; color:#64748b;' : ''}">
+                           
+                    <button type="button" th:if="${user == null}"
+                            onclick="var id = document.getElementById('userIdInput').value; if(id) window.location.href='/api/users/' + id + '/assign-roles';"
+                            style="background:#f1f5f9; border:1px solid #cbd5e1; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#475569; white-space:nowrap; transition:all 0.2s;"
+                            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">
+                        Fetch Current Roles
+                    </button>
+                    
+                    <a th:if="${user != null}" href="/api/users/assign-roles"
+                       style="background:#fef2f2; border:1px solid #fca5a5; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#ef4444; text-decoration:none; white-space:nowrap; display:flex; align-items:center;">
+                        Clear
+                    </a>
+                </div>
+            </div>
+
+            <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:10px; display:block;">
+                <span th:text="${user != null ? 'Edit Roles for ' + user.username : 'Select New Roles'}"></span>
+            </label>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px; background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
+                <label th:each="role : ${allRoles}" style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:500; color:#334155;">
+                    <input type="checkbox" name="roles"
+                           th:value="${role}"
+                           th:checked="${user != null and user.roles.contains(role)}"
+                           style="width:18px; height:18px; accent-color:#8b5cf6; cursor:pointer;">
+                    <span th:text="${role}"></span>
+                </label>
+            </div>
+
+            <button type="submit" style="width:100%; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:white;
+                           padding:12px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:15px;">
+                Assign Roles
+            </button>
+        </form>
+
+    </div>
+
+</div>
+</html>

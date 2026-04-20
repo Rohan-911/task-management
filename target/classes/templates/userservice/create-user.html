@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <!-- PAGE TITLE -->
+    <div style="text-align:center; margin-bottom:30px;">
+        <h2 style="font-weight:700;">Create User</h2>
+        <p style="color:#6c757d;">Add a new user to the system</p>
+    </div>
+
+    <!-- CARD -->
+    <div style="max-width:500px; margin:auto; background:white;
+                padding:30px; border-radius:12px;
+                box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+
+        <!-- ERROR -->
+        <div th:if="${error}"
+             style="background:#fee2e2; color:#b91c1c;
+                    padding:10px; border-radius:8px; margin-bottom:15px;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form action="/api/users" method="post"
+              th:object="${userRequestDTO}">
+
+            <!-- USER ID -->
+            <div style="margin-bottom:15px;">
+                <label style="font-weight:600;">User ID</label>
+                <input type="number" name="userId"
+                       placeholder="Enter User ID"
+                       class="form-control"
+                       style="border-radius:8px;">
+                <div style="color:red; font-size:13px;"
+                     th:if="${#fields.hasErrors('userId')}"
+                     th:errors="*{userId}"></div>
+            </div>
+
+            <!-- USERNAME -->
+            <div style="margin-bottom:15px;">
+                <label style="font-weight:600;">Username</label>
+                <input name="username"
+                       placeholder="Enter username"
+                       class="form-control"
+                       style="border-radius:8px;">
+                <div style="color:red; font-size:13px;"
+                     th:if="${#fields.hasErrors('username')}"
+                     th:errors="*{username}"></div>
+            </div>
+
+            <!-- PASSWORD -->
+            <div style="margin-bottom:15px;">
+                <label style="font-weight:600;">Password</label>
+                <input type="password" name="password"
+                       placeholder="Enter password"
+                       class="form-control"
+                       style="border-radius:8px;">
+                <div style="color:red; font-size:13px;"
+                     th:if="${#fields.hasErrors('password')}"
+                     th:errors="*{password}"></div>
+            </div>
+
+            <!-- EMAIL -->
+            <div style="margin-bottom:15px;">
+                <label style="font-weight:600;">Email</label>
+                <input name="email"
+                       placeholder="example@gmail.com (lowercase only)"
+                       class="form-control"
+                       style="border-radius:8px;">
+                <div style="color:red; font-size:13px;"
+                     th:if="${#fields.hasErrors('email')}"
+                     th:errors="*{email}"></div>
+            </div>
+
+            <!-- FULL NAME -->
+            <div style="margin-bottom:20px;">
+                <label style="font-weight:600;">Full Name</label>
+                <input name="fullName"
+                       placeholder="Enter full name"
+                       class="form-control"
+                       style="border-radius:8px;">
+                <div style="color:red; font-size:13px;"
+                     th:if="${#fields.hasErrors('fullName')}"
+                     th:errors="*{fullName}"></div>
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit"
+                    style="width:100%; background:#16a34a; color:white;
+                           padding:10px; border:none;
+                           border-radius:8px; font-weight:600;">
+                Create User
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</html>

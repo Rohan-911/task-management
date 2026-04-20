@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Project</title>
+    <style>
+        body { background-color: #f8f9fb; font-family: 'Segoe UI', sans-serif; }
+        .container-box { max-width: 620px; margin: 50px auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .method-badge { color: orange; font-weight: 700; }
+        .label { display: block; margin-bottom: 6px; font-weight: 600; color: #334155; }
+        input { width: 100%; padding: 12px; border: 1px solid #dbe2ea; border-radius: 10px; box-sizing: border-box; margin-bottom: 16px; }
+        .btn { padding: 12px 18px; border-radius: 10px; text-decoration: none; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: orange; color: white; }
+        .btn-secondary { background: #eef2f7; color: #334155; }
+        .actions { display: flex; gap: 12px; margin-top: 18px; }
+    </style>
+</head>
+<body>
+<div class="container-box">
+    <div class="header-row">
+        <div>
+            <h2 style="margin: 0;">Edit Project</h2>
+            <p style="margin: 6px 0 0; color: #64748b;">Enter the project ID to open the edit form.</p>
+        </div>
+        <div class="method-badge">PUT</div>
+    </div>
+
+    <form th:action="@{/ui/projects/edit}" th:object="${deleteProjectRequest}" method="post">
+        <label class="label">Project ID *</label>
+        <input type="number" th:field="*{projectId}" placeholder="Enter project id">
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Open Edit Form</button>
+            <a th:href="@{/ui/projects/dashboard}" class="btn btn-secondary">Dashboard</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

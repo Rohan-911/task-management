@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{userservice/layout :: layout(~{::content})}">
+
+<div th:fragment="content">
+
+    <div style="max-width:500px; margin:auto;">
+
+        <h3 style="text-align:center; color:#1e293b; font-weight:700;">Update User By ID</h3>
+
+        <div th:if="${success}" style="background:#dcfce7; color:#15803d; padding:12px 20px; border-radius:8px; margin-top:20px; border-left:4px solid #22c55e;">
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" style="background:#fee2e2; color:#b91c1c; padding:12px 20px; border-radius:8px; margin-top:20px; border-left:4px solid #ef4444;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{${user != null ? '/api/users/' + user.userId + '/edit' : '#'}}" method="post"
+              style="margin-top:20px; background:white; padding:25px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+
+            <div style="margin-bottom:20px;">
+                <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:5px; display:block;">Enter User ID to Update</label>
+                <div style="display:flex; gap:10px;">
+                    <input id="userIdInput" name="userId" type="number" required placeholder="e.g. 1"
+                           th:value="${user != null ? user.userId : ''}"
+                           th:readonly="${user != null}"
+                           style="flex:1; padding:10px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;"
+                           th:styleappend="${user != null ? 'background:#f1f5f9; color:#64748b;' : ''}">
+                           
+                    <button type="button" th:if="${user == null}"
+                            onclick="var id = document.getElementById('userIdInput').value; if(id) window.location.href='/api/users/' + id + '/edit';"
+                            style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#475569; white-space:nowrap; transition:all 0.2s;"
+                            onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f8fafc';">
+                        Fetch User
+                    </button>
+                    
+                    <a th:if="${user != null}" href="/api/users/edit"
+                       style="background:#f1f5f9; border:1px solid #cbd5e1; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#475569; text-decoration:none; white-space:nowrap; display:flex; align-items:center;">
+                        Clear
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${user != null}" style="border-top:1px solid #e2e8f0; padding-top:20px; margin-top:10px;">
+                <div style="margin-bottom:15px;">
+                    <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:5px; display:block;">Username</label>
+                    <input name="username" type="text" th:value="${user.username}" required
+                           style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:5px; display:block;">Email</label>
+                    <input name="email" type="email" th:value="${user.email}" required
+                           style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="color:#475569; font-weight:600; font-size:14px; margin-bottom:5px; display:block;">Full Name</label>
+                    <input name="fullName" type="text" th:value="${user.fullName}" required
+                           style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                </div>
+
+                <input type="hidden" name="password" value="dummy">
+
+                <button type="submit" style="width:100%; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white;
+                               padding:12px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:15px;">
+                    💾 Save Updates
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+</html>
