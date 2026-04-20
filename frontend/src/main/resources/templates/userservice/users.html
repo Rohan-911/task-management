@@ -16,7 +16,7 @@
             <p style="color:#64748b; margin-top:5px; margin-bottom:0;">View and manage system users</p>
         </div>
 
-        <a href="/create-user"
+        <a href="/api/users/new"
            class="admin-only create-btn"
            style="display:none;">
             + Create New User
@@ -75,7 +75,7 @@
                                 Edit Roles ▾
                             </button>
                             <div class="dropdown-menu-custom">
-                                <form th:action="@{'/assign-roles/' + ${u.userId}}" method="post">
+                                <form th:action="@{'/api/users/' + ${u.userId} + '/assign-roles'}" method="post">
                                     <div style="max-height: 150px; overflow-y: auto; text-align: left; margin-bottom: 12px; padding-right: 5px;">
                                         <label th:each="role : ${allRoles}" class="dropdown-item-custom">
                                             <input type="checkbox" name="roles"
@@ -94,11 +94,11 @@
                     <!-- ADMIN ONLY: Actions -->
                     <td class="admin-only" style="display:none; padding:16px 20px; text-align:center;">
                         <div style="display:flex; gap:8px; justify-content:center;">
-                            <a th:href="@{'/update-user/' + ${u.userId}}" class="btn-icon btn-edit" title="Edit User">
+                            <a th:href="@{'/api/users/' + ${u.userId} + '/edit'}" class="btn-icon btn-edit" title="Edit User">
                                 ✏️ Edit
                             </a>
 
-                            <form th:action="@{'/delete-user/' + ${u.userId}}" method="post" style="margin:0;"
+                            <form th:action="@{'/api/users/' + ${u.userId} + '/delete'}" method="post" style="margin:0;"
                                   onsubmit="return confirm('Are you sure you want to delete this user?');">
                                 <button type="submit" class="btn-icon btn-delete" title="Delete User">
                                     🗑️ Delete
@@ -119,13 +119,13 @@
             Showing page <b th:text="${currentPage + 1}"></b> of <b th:text="${totalPages}"></b>
         </div>
         <div style="display:flex; gap:10px;">
-            <a th:if="${currentPage > 0}" th:href="@{'/users-view?page=' + ${currentPage - 1}}" 
+            <a th:if="${currentPage > 0}" th:href="@{'/api/users?page=' + ${currentPage - 1}}" 
                style="padding:8px 16px; background:white; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s;"
                onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='white';">
                 Previous
             </a>
             
-            <a th:if="${currentPage < totalPages - 1}" th:href="@{'/users-view?page=' + ${currentPage + 1}}" 
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{'/api/users?page=' + ${currentPage + 1}}" 
                style="padding:8px 16px; background:white; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:14px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s;"
                onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='white';">
                 Next
