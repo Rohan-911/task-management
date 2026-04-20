@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Delete Project</title>
+    <style>
+        body {
+            background-color: #f8f9fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .method-badge {
+            color: red;
+            font-weight: 700;
+        }
+
+        .warning-box {
+            background: #fff5f5;
+            border: 1px solid #ffd4d4;
+            border-radius: 12px;
+            padding: 18px;
+            color: #7f1d1d;
+        }
+
+        .summary {
+            background: #f8fafc;
+            border: 1px solid #e5edf5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 16px;
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-danger {
+            background: red;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #eef2f7;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+<div class="container-box">
+    <div class="header-row">
+        <div>
+            <h2 style="margin: 0;">Delete Project</h2>
+            <p style="margin: 6px 0 0; color: #64748b;">Confirmation page before calling DELETE API.</p>
+        </div>
+        <div class="method-badge">DELETE</div>
+    </div>
+
+    <div class="warning-box">
+        This action will permanently delete the selected project.
+    </div>
+
+    <div class="summary">
+        <div><strong>Project ID:</strong> <span th:text="${project.projectId}"></span></div>
+        <div style="margin-top: 8px;"><strong>Project Name:</strong> <span th:text="${project.projectName}"></span></div>
+        <div style="margin-top: 8px;"><strong>User:</strong> <span th:text="${project.userName != null ? project.userName : 'Not assigned'}"></span></div>
+    </div>
+
+    <div class="actions">
+        <form th:action="@{/ui/projects/delete/{projectId}(projectId=${project.projectId})}" method="post">
+            <button type="submit" class="btn btn-danger">Yes, Delete Project</button>
+        </form>
+        <a th:href="@{/ui/projects/dashboard}" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+</body>
+</html>

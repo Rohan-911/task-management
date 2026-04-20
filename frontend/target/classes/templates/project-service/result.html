@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>API Result</title>
+    <style>
+        body {
+            background-color: #f8f9fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 760px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .method {
+            font-weight: 700;
+        }
+
+        .GET { color: green; }
+        .POST { color: blue; }
+        .PUT { color: orange; }
+        .DELETE { color: red; }
+
+        .status-box {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .error-box {
+            background: #fff1f1;
+            color: #b42318;
+            border: 1px solid #ffd2d2;
+        }
+
+        .result-card {
+            background: #f8fafc;
+            border: 1px solid #e5edf5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 14px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .search-row input {
+            flex: 1;
+            padding: 11px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+        }
+
+        .row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            width: 160px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .value {
+            flex: 1;
+            color: #475569;
+        }
+
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 11px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            background: #eef2f7;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+<div class="container-box">
+    <div class="header-row">
+        <div>
+            <h2 style="margin: 0;">Request Result</h2>
+            <p style="margin: 6px 0 0; color: #64748b;">Project-service response shown with success or error details.</p>
+        </div>
+        <div class="method" th:classappend="${method}" th:text="${method}">GET</div>
+    </div>
+
+    <div th:if="${hasResult == true and success == false}" class="status-box error-box">
+        <div th:text="${message}"></div>
+        <div th:if="${errorDetails}" style="margin-top: 6px;" th:text="${errorDetails}"></div>
+    </div>
+
+    <div th:if="${hasResult == true and httpStatus != null}" class="result-card">
+        <strong>HTTP Status:</strong> <span th:text="${httpStatus}"></span>
+    </div>
+
+    <div th:if="${showCountSearch}" class="result-card">
+        <form th:action="@{/ui/projects/count}" th:object="${countSearchRequest}" method="post">
+            <label style="display:block; margin-bottom:6px; font-weight:600; color:#334155;">Get Count By User ID</label>
+            <div class="search-row">
+                <input type="number" th:field="*{userId}" placeholder="Enter user id">
+                <button type="submit" class="btn">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${showProjectExistsSearch}" class="result-card">
+        <form th:action="@{/ui/projects/exists}" th:object="${projectExistsSearchRequest}" method="post">
+            <label style="display:block; margin-bottom:6px; font-weight:600; color:#334155;">Check Project Exists By Project ID</label>
+            <div class="search-row">
+                <input type="number" th:field="*{projectId}" placeholder="Enter project id">
+                <button type="submit" class="btn">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${showProjectUserSearch}" class="result-card">
+        <form th:action="@{/ui/projects/user/open}" th:object="${projectUserSearchRequest}" method="post">
+            <label style="display:block; margin-bottom:6px; font-weight:600; color:#334155;">Get User Of Project By Project ID</label>
+            <div class="search-row">
+                <input type="number" th:field="*{projectId}" placeholder="Enter project id">
+                <button type="submit" class="btn">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${hasResult == true and project != null}" class="result-card">
+        <div class="row">
+            <div class="label">Project ID</div>
+            <div class="value" th:text="${project.projectId}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Project Name</div>
+            <div class="value" th:text="${project.projectName}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Description</div>
+            <div class="value" th:text="${project.description != null and !#strings.isEmpty(project.description) ? project.description : 'No description'}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Start Date</div>
+            <div class="value" th:text="${project.startDate}"></div>
+        </div>
+        <div class="row">
+            <div class="label">End Date</div>
+            <div class="value" th:text="${project.endDate != null ? project.endDate : 'Not set'}"></div>
+        </div>
+        <div class="row">
+            <div class="label">User Name</div>
+            <div class="value" th:text="${project.userName != null ? project.userName : 'Not assigned'}"></div>
+        </div>
+    </div>
+
+    <div th:if="${hasResult == true and extraMessage != null}" class="result-card" th:text="${extraMessage}"></div>
+
+    <div th:if="${hasResult == true and user != null}" class="result-card">
+        <div class="row">
+            <div class="label">User ID</div>
+            <div class="value" th:text="${user.userId}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Username</div>
+            <div class="value" th:text="${user.username}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Full Name</div>
+            <div class="value" th:text="${user.fullName}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Email</div>
+            <div class="value" th:text="${user.email}"></div>
+        </div>
+        <div class="row">
+            <div class="label">Roles</div>
+            <div class="value" th:text="${user.roles}"></div>
+        </div>
+    </div>
+
+    <div th:if="${hasResult == true}" class="actions">
+        <button type="button" class="btn" onclick="history.back()">Back</button>
+        <a th:href="@{/ui/projects/dashboard}" class="btn">Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

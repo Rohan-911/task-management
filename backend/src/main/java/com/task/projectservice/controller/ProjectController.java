@@ -52,6 +52,17 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getUserOfProject(projectId));
     }
     
+    @GetMapping("/projects/active")
+    public ResponseEntity<List<ProjectResponseDto>> getActiveProjects() {
+        return ResponseEntity.ok(projectService.getActiveProjects());
+    }
+
+    @GetMapping("/projects/completed")
+    public ResponseEntity<List<ProjectResponseDto>> getCompletedProjects() {
+        return ResponseEntity.ok(projectService.getCompletedProjects());
+    }
+
+    
     @PutMapping("/projects/{projectId}")
     public ResponseEntity<ProjectResponseDto> updateProject(
             @PathVariable Integer projectId,
@@ -61,13 +72,6 @@ public class ProjectController {
         return ResponseEntity.ok(updatedProject);
     }
 
-    @PatchMapping("/projects/{projectId}")
-    public ResponseEntity<ProjectResponseDto> patchProject(
-            @PathVariable Integer projectId,
-            @RequestBody ProjectRequestDto dto) {
-
-        return ResponseEntity.ok(projectService.patchProject(projectId, dto));
-    }
     
     @PatchMapping("/projects/{projectId}/user/remove")
     public ResponseEntity<ProjectResponseDto> removeUserFromProject(

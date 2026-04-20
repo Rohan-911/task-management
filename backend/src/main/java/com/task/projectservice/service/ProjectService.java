@@ -17,10 +17,12 @@ public interface ProjectService {
     List<ProjectResponseDto> getAllProjects();
 
     UserResponseDTO getUserOfProject(Integer projectId);
+    
+    List<ProjectResponseDto> getActiveProjects();
+
+    List<ProjectResponseDto> getCompletedProjects();
 
     ProjectResponseDto updateProject(Integer projectId, ProjectRequestDto dto);
-
-    ProjectResponseDto patchProject(Integer projectId, ProjectRequestDto dto);
 
     ProjectResponseDto removeUserFromProject(Integer projectId);
 

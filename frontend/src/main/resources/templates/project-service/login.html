@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #f8f9fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 520px;
+            margin: 70px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            color: blue;
+            font-weight: 700;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+        }
+
+        .error-box {
+            background: #fff1f1;
+            border: 1px solid #ffd2d2;
+            color: #b42318;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e5edf5;
+            color: #475569;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container-box">
+    <div class="header-row">
+        <div>
+            <h2 style="margin: 0;">Login</h2>
+            <p style="margin: 6px 0 0; color: #64748b;">Temporary session-based login for project-service frontend.</p>
+        </div>
+        <div class="tag">JWT</div>
+    </div>
+
+    <div th:if="${param.expired}" class="info-box">
+        Your session is missing or expired. Please log in again.
+    </div>
+
+    <div th:if="${loginError}" class="error-box" th:text="${loginError}"></div>
+
+    <form th:action="@{/ui/login}" th:object="${loginRequestDto}" method="post">
+        <label class="label">Username</label>
+        <input type="text" th:field="*{username}" placeholder="Enter username">
+
+        <label class="label">Password</label>
+        <input type="password" th:field="*{password}" placeholder="Enter password">
+
+        <button type="submit" class="btn">Login</button>
+    </form>
+</div>
+</body>
+</html>
