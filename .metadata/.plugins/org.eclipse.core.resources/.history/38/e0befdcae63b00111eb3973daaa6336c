@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{taskservice/layout :: layout (~{::body})}">
+
+<body>
+
+<style>
+    .dashboard-title {
+        text-align: center;
+        font-weight: 700;
+        color: #6c63ff;
+        margin-bottom: 20px;
+    }
+
+    .table-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .table thead {
+        background: #1f2937;
+        color: white;
+    }
+
+    .status-pill {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .pending { background: #d1fae5; color: #065f46; }
+    .completed { background: #dbeafe; color: #1d4ed8; }
+    .progress { background: #fef3c7; color: #92400e; }
+
+    .btn-edit { background: #f59e0b; color: white; border-radius: 8px; }
+    .btn-delete { background: #ef4444; color: white; border-radius: 8px; }
+
+</style>
+
+<h2 class="dashboard-title">Task Dashboard</h2>
+
+<!-- 🔍 SEARCH + CREATE -->
+<div class="d-flex justify-content-between mb-3">
+
+    <form th:if="${!viewOnly}" action="/tasks/search" method="get" class="d-flex">
+        <input type="text" name="name" class="form-control me-2" placeholder="Search task...">
+        <button class="btn btn-dark">Search</button>
+    </form>
+
+    <a th:if="${!viewOnly}" href="/tasks/create" class="btn btn-primary">
+        + Create Task
+    </a>
+
+</div>
+
+<!-- 🔢 PAGINATION LOGIC (UNCHANGED) -->
+<div th:with="
+    page=${param.page != null ? T(java.lang.Integer).parseInt(param.page[0]) : 0},
+    size=5,
+    start=${page * size},
+    end=${start + size > tasks.size()} ? ${tasks.size()} : ${start + size},
+    pageList=${tasks.subList(start, end)}
+">
+
+<div class="table-card bg-white p-3">
+
+    <table class="table table-hover align-middle">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th th:if="${!viewOnly}">Action</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="t : ${pageList}">
+
+            <td th:text="${t.taskID}"></td>
+            <td th:text="${t.taskName}"></td>
+            <td th:text="${t.description}"></td>
+
+            <td>
+                <span class="status-pill"
+                      th:classappend="
+                        ${t.status == 'Completed'} ? ' completed' :
+                        (${t.status == 'Pending'} ? ' pending' : ' progress')"
+                      th:text="${t.status}">
+                </span>
+            </td>
+
+            <td th:text="${t.priority}"></td>
+
+            <td th:text="${t.dueDate != null ? #dates.format(t.dueDate, 'dd-MM-yyyy') : 'N/A'}"></td>
+
+            <td th:if="${!viewOnly}">
+                <a th:href="@{'/tasks/edit/' + ${t.taskID}}" class="btn btn-edit btn-sm me-1">Edit</a>
+                <a th:href="@{'/tasks/delete/' + ${t.taskID}}" class="btn btn-delete btn-sm"
+                   onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+
+        </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- 🔢 PAGINATION BUTTONS (UNCHANGED) -->
+<div class="d-flex justify-content-center mt-3"
+     th:with="totalPages=${(tasks.size() + size - 1) / size}">
+
+    <a class="btn btn-secondary me-2"
+       th:if="${page > 0}"
+       th:href="@{/tasks(page=${page - 1})}">
+        Previous
+    </a>
+
+    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <a class="btn btn-outline-primary me-1"
+           th:classappend="${i == page} ? 'active'"
+           th:href="@{/tasks(page=${i})}"
+           th:text="${i + 1}">
+        </a>
+    </span>
+
+    <a class="btn btn-secondary ms-2"
+       th:if="${page < totalPages - 1}"
+       th:href="@{/tasks(page=${page + 1})}">
+        Next
+    </a>
+
+</div>
+
+</div>
+
+</body>
+</html>

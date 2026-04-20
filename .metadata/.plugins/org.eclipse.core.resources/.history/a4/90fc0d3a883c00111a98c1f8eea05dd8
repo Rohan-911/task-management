@@ -1,0 +1,297 @@
+package com.frontend.taskservice.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import com.frontend.taskservice.dto.TaskDTO;
+import com.frontend.taskservice.service.TaskService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService service;
+
+    
+    @GetMapping("/task-login")
+    public String showTaskLogin() {
+        return "taskservice/login";
+    }
+
+    
+    @GetMapping("/task-endpoints")
+    public String showTaskEndpoints(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+ 
+
+        return "taskservice/task-endpoints";
+    }
+
+   
+    @GetMapping
+    public String list(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        model.addAttribute("tasks", service.getAllTasks());
+        model.addAttribute("viewOnly", false);
+        model.addAttribute("currentPage", 0);
+
+        return "taskservice/tasks";
+    }
+
+    
+    @GetMapping("/view")
+    public String viewTasks(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        model.addAttribute("tasks", service.getAllTasks());
+        model.addAttribute("viewOnly", true);
+        model.addAttribute("currentPage", 0);
+
+        return "taskservice/tasks";
+    }
+
+    
+    @GetMapping("/id")
+    public String getTaskById(@RequestParam Integer id,
+                             Model model,
+                             HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+        	TaskDTO task = service.getTaskById(id);
+        
+        model.addAttribute("task", task);
+
+        return "taskservice/gettaskbyid";
+        }catch (Exception ex) {
+        	model.addAttribute("errorMessage", extractMessage(ex.getMessage()));
+            return "error";
+        }
+    }
+
+    
+    @GetMapping("/create")
+    public String showCreateForm(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
+        model.addAttribute("task", new TaskDTO());
+        return "taskservice/create-task";
+    }
+
+    
+    @PostMapping("/create")
+    public String createTask(@ModelAttribute TaskDTO task,
+                             HttpServletRequest request,
+                             Model model) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
+        try {
+            service.createTask(task);
+            return "redirect:/tasks";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", extractMessage(ex.getMessage()));
+            return "error";
+        }
+    }
+
+    
+
+    
+    @GetMapping("/edit/{id}")
+    public String editTask(@PathVariable Integer id,
+                           Model model,
+                           HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("JWT_TOKEN") == null) {
+            return "redirect:/tasks/task-login";
+        }
+        if (!isAdmin(session)) {
+            return "access-denied";
+        }
+
+        TaskDTO task = service.getTaskById(id);
+        model.addAttribute("task", task);
+
+        return "taskservice/edit-task";
+    }
+
+    
+    @GetMapping("/search")
+    public String searchTask(@RequestParam String name,
+                            Model model,
+                            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        try {
+            List<TaskDTO> tasks = service.searchTasks(name);
+            model.addAttribute("tasks", tasks);
+            return "taskservice/search-task";
+
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", extractMessage(ex.getMessage()));
+            return "error";
+        }
+    }
+
+    @GetMapping("/search/status")
+    public String searchByStatus(@RequestParam String status,
+                                Model model,
+                                HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        List<TaskDTO> tasks = service.searchByStatus(status);
+        model.addAttribute("tasks", tasks);
+
+        return "taskservice/search-status";
+    }
+
+    @GetMapping("/search/priority")
+    public String searchByPriority(@RequestParam String priority,
+                                  Model model,
+                                  HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        List<TaskDTO> tasks = service.searchByPriority(priority);
+        model.addAttribute("tasks", tasks);
+
+        return "taskservice/search-priority";
+    }
+
+    @GetMapping("/project")
+    public String getByProject(@RequestParam Integer projectId,
+                              Model model,
+                              HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        List<TaskDTO> tasks = service.getByProject(projectId);
+        model.addAttribute("tasks", tasks);
+
+        return "taskservice/gettaskbyprojectid";
+    }
+
+    @GetMapping("/user")
+    public String getByUser(@RequestParam Integer userId,
+                           Model model,
+                           HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return "redirect:/tasks/task-login";
+        }
+
+        List<TaskDTO> tasks = service.getByUser(userId);
+        model.addAttribute("tasks", tasks);
+
+        return "taskservice/gettaskbyuser";
+    }
+
+    
+    private boolean isAdmin(HttpSession session) {
+        List<String> roles = (List<String>) session.getAttribute("ROLES");
+
+        return roles != null &&
+               roles.stream().anyMatch(r -> r.equalsIgnoreCase("admin"));
+    }
+    private String extractMessage(HttpStatusCodeException ex) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> error = mapper.readValue(
+                    ex.getResponseBodyAsString(),
+                    Map.class
+            );
+
+            String message = (String) error.get("message");
+
+            // 🔥 CUSTOM MAPPING
+            if (message != null) {
+
+                if (message.toLowerCase().contains("constraint")) {
+                    return "Task with this ID already exists";
+                }
+
+                if (message.toLowerCase().contains("not found")) {
+                    return message;
+                }
+
+                if (message.toLowerCase().contains("duplicate")) {
+                    return "Task with this ID already exists";
+                }
+            }
+
+            return message;
+
+        } catch (Exception e) {
+            return "Something went wrong";
+        }
+    }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task Module</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            max-width: 900px;
+            margin: auto;
+            margin-top: 40px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .endpoint {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .method {
+            font-weight: bold;
+            width: 80px;
+        }
+
+        .get { color: green; }
+        .post { color: blue; }
+        .put { color: orange; }
+        .delete { color: red; }
+
+        .endpoint-info {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .endpoint-info small {
+            display: block;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .section-title {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-box">
+
+    <h3 class="text-center mb-4">Task Module APIs</h3>
+
+    <!-- CREATE -->
+    <div class="section-title">Create Task</div>
+    <div class="endpoint">
+        <div class="method post">POST</div>
+        <div class="endpoint-info">
+            Create Task
+            <small>/api/tasks/create</small>
+        </div>
+        <a href="/tasks/create" class="btn btn-success btn-sm">Open</a>
+    </div>
+
+    <!-- FETCH -->
+    <div class="section-title">Fetch Tasks</div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            All Tasks
+            <small>/api/tasks/all</small>
+        </div>
+        <a href="/tasks" class="btn btn-primary btn-sm">Open</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Task By ID
+            <small>/api/tasks/{id}</small>
+        </div>
+        <a href="/tasks/id?id=1" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Tasks By User
+            <small>/api/tasks/user/{userId}</small>
+        </div>
+        <a href="/tasks/user?userId=1" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Tasks By Project
+            <small>/api/tasks/project/{projectId}</small>
+        </div>
+        <a href="/tasks/project?projectId=1" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Search by Status
+            <small>/api/tasks/status/{status}</small>
+        </div>
+        <a href="/tasks/search/status?status=Pending" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Search by Priority
+            <small>/api/tasks/priority/{priority}</small>
+        </div>
+        <a href="/tasks/search/priority?priority=High" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <div class="endpoint">
+        <div class="method get">GET</div>
+        <div class="endpoint-info">
+            Search by Name
+            <small>/api/tasks/search/{name}</small>
+        </div>
+        <a href="/tasks/search?name=Test Task" class="btn btn-primary btn-sm">Test</a>
+    </div>
+
+    <!-- UPDATE -->
+    <div class="section-title">Update Task</div>
+    <div class="endpoint">
+        <div class="method put">PUT</div>
+        <div class="endpoint-info">
+            Edit Task
+            <small>/api/tasks/update/{id}</small>
+        </div>
+        <a href="/tasks/edit/1" class="btn btn-warning btn-sm">Open</a>
+    </div>
+
+    <!-- DELETE -->
+    <div class="section-title">Delete Task</div>
+    <div class="endpoint">
+        <div class="method delete">DELETE</div>
+        <div class="endpoint-info">
+            Delete Task
+            <small>/api/tasks/delete/{id}</small>
+        </div>
+        <a href="/tasks/delete/1" class="btn btn-danger btn-sm">Delete</a>
+    </div>
+
+    <!-- BACK -->
+    <div class="text-center mt-4">
+        <a href="/home" class="btn btn-secondary">⬅ Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>

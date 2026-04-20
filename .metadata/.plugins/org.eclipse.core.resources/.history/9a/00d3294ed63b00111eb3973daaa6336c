@@ -1,0 +1,26 @@
+package com.frontend.config;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+
+@Component
+public class JwtInterceptor {
+
+    private final HttpServletRequest request;
+
+    public JwtInterceptor(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    public RestClient.RequestHeadersSpec<?> addAuthHeader(RestClient.RequestHeadersSpec<?> spec) {
+
+        String token = (String) request.getSession().getAttribute("JWT_TOKEN");
+
+        if (token != null) {
+            return spec.header("Authorization", "Bearer " + token);
+        }
+
+        return spec;
+    }
+}

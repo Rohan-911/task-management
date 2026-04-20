@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{taskservice/layout :: layout (~{::body})}">
+
+<body>
+
+<div>
+
+    <h2>Task List</h2>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+        </tr>
+
+        <tr th:each="t : ${tasks}">
+            <td th:text="${t.taskID}"></td>
+            <td th:text="${t.taskName}"></td>
+            <td th:text="${t.status}"></td>
+        </tr>
+
+    </table>
+
+</div>
+
+</body>
+</html>

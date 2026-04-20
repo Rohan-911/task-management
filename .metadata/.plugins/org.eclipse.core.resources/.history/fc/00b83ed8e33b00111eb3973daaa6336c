@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{taskservice/layout :: layout (~{::body})}">
+
+<body>
+
+<div class="glass-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="bi bi-list-task"></i> Task List</h3>
+
+        <a href="/tasks/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Task
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="t : ${tasks}">
+
+                <td class="fw-semibold" th:text="${t.taskID}"></td>
+
+                <td th:text="${t.taskName}"></td>
+
+                <td>
+                    <span class="badge"
+                          th:classappend="
+                          ${t.status == 'COMPLETED'} ? ' bg-success' :
+                          (${t.status == 'PENDING'} ? ' bg-warning text-dark' : ' bg-danger')"
+                          th:text="${t.status}">
+                    </span>
+                </td>
+
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

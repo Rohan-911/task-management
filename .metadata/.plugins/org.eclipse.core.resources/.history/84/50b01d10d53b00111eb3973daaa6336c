@@ -1,0 +1,5 @@
+package com.frontend.config;
+
+public class JwtInterceptor {
+
+}
