@@ -23,7 +23,7 @@ public class ViewController {
         this.userService = userService;
     }
 
-    @GetMapping({"/", "/login"})
+    @GetMapping("/login")
     public String home() {
         return "userservice/login";
     }
