@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Task Module</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	<style>
+	        body {
+	            background: linear-gradient(135deg, #0f172a, #1e293b);
+	            color: white;
+	            font-family: 'Segoe UI', sans-serif;
+	        }
+
+	        .container-box {
+	            max-width: 900px;
+	            margin: 40px auto;
+	            padding: 30px;
+	            border-radius: 15px;
+	            background: #1e293b;
+	            text-align: center;
+	            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+	        }
+
+        
+        /* HEADER */
+        .page-title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1e293b;
+        }
+
+        /* SECTION CARD */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #334155;
+        }
+
+        /* ENDPOINT ROW */
+        .endpoint {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 10px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .endpoint:hover {
+            background: #f1f5f9;
+        }
+
+        /* METHOD BADGE */
+        .method {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            padding: 5px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .get { background: #dcfce7; color: #166534; }
+        .post { background: #dbeafe; color: #1d4ed8; }
+        .put { background: #fef3c7; color: #92400e; }
+        .delete { background: #fee2e2; color: #991b1b; }
+
+        /* ENDPOINT TEXT */
+        .endpoint-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .endpoint-info small {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* BUTTONS */
+        .btn-sm {
+            border-radius: 8px;
+            padding: 5px 12px;
+        }
+
+        .btn-open { background: #22c55e; color: white; }
+        .btn-test { background: #3b82f6; color: white; }
+        .btn-update { background: #f59e0b; color: white; }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container-box">
+
+    <h3 class="page-title"> Task service APIs</h3>
+
+    <!-- CREATE -->
+    <div class="section">
+        <div class="section-title">Create Task</div>
+
+        <div class="endpoint">
+            <div class="method post">POST</div>
+            <div class="endpoint-info">
+                Create Task
+                <small>/api/tasks/create</small>
+            </div>
+            <a href="/tasks/create" class="btn btn-open btn-sm">Open</a>
+        </div>
+    </div>
+
+    <!-- FETCH -->
+    <div class="section">
+        <div class="section-title">Fetch Tasks</div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                All Tasks
+                <small>/api/tasks/all</small>
+            </div>
+            <a href="/tasks" class="btn btn-test btn-sm">Open</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Task By ID
+                <small>/api/tasks/{id}</small>
+            </div>
+            <a href="/tasks/id?id=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Tasks By User
+                <small>/api/tasks/user/{userId}</small>
+            </div>
+            <a href="/tasks/user?userId=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Tasks By Project
+                <small>/api/tasks/project/{projectId}</small>
+            </div>
+            <a href="/tasks/project?projectId=1" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Search by Status
+                <small>/api/tasks/status/{status}</small>
+            </div>
+            <a href="/tasks/search/status?status=Pending" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Search by Priority
+                <small>/api/tasks/priority/{priority}</small>
+            </div>
+            <a href="/tasks/search/priority?priority=High" class="btn btn-test btn-sm">Test</a>
+        </div>
+
+        <div class="endpoint">
+            <div class="method get">GET</div>
+            <div class="endpoint-info">
+                Search by Name
+                <small>/api/tasks/search/{name}</small>
+            </div>
+            <a href="/tasks/search?name=Test Task" class="btn btn-test btn-sm">Test</a>
+        </div>
+    </div>
+
+    <!-- UPDATE -->
+    <div class="section">
+        <div class="section-title">Update Task</div>
+
+        <div class="endpoint">
+            <div class="method put">PUT</div>
+            <div class="endpoint-info">
+                Edit Task
+                <small>/api/tasks/update/{id}</small>
+            </div>
+            <a href="/tasks/edit/1" class="btn btn-update btn-sm">Open</a>
+        </div>
+    </div>
+
+    <!-- BACK -->
+    <div class="text-center mt-4">
+        <a href="/home" class="btn btn-secondary"> Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>

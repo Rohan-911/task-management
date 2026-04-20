@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     <div th:replace="~{taskservice/layout :: content}"></div>
+
+<div>
+
+    <div class="card p-4">
+
+        <h2 class="mb-4 text-center fw-bold">
+            <i class="bi bi-list-task"></i> Task List
+        </h2>
+
+        <!-- 🔍 Search -->
+        <form th:if="${!viewOnly}" action="/tasks/search" method="get" class="mb-3 d-flex">
+            <input type="text" name="name" class="form-control me-2" placeholder="🔍 Search task...">
+            <button class="btn btn-dark">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+
+        <!-- ➕ Create -->
+        <div class="d-flex justify-content-between mb-3">
+            <a th:if="${!viewOnly}" href="/tasks/create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create Task
+            </a>
+        </div>
+
+        <!-- 🔢 Pagination Logic -->
+        <div th:with="
+            page=${param.page != null ? T(java.lang.Integer).parseInt(param.page[0]) : 0},
+            size=5,
+            start=${page * size},
+            end=${start + size > tasks.size()} ? ${tasks.size()} : ${start + size},
+            pageList=${tasks.subList(start, end)}
+        ">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th th:if="${!viewOnly}">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="t : ${pageList}">
+
+                    <td class="fw-semibold" th:text="${t.taskID}"></td>
+
+                    <td th:text="${t.taskName}"></td>
+
+                    <td th:text="${t.description}"></td>
+
+                    <!-- 🎨 Styled Status -->
+                    <td>
+                        <span class="badge"
+                              th:classappend="
+                                ${t.status == 'COMPLETED'} ? ' bg-success' :
+                                (${t.status == 'PENDING'} ? ' bg-warning text-dark' : ' bg-danger')"
+                              th:text="${t.status}">
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="badge bg-info text-dark"
+                              th:text="${t.priority}"></span>
+                    </td>
+
+                    <td th:text="${t.dueDate != null ? #dates.format(t.dueDate, 'dd-MM-yyyy') : 'N/A'}"></td>
+
+                    <td th:if="${!viewOnly}">
+                        <a th:href="@{'/tasks/edit/' + ${t.taskID}}"
+                           class="btn btn-warning btn-sm">
+                           <i class="bi bi-pencil"></i>
+                        </a>
+
+                        <a th:href="@{'/tasks/delete/' + ${t.taskID}}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure?')">
+                           <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- 🔢 Pagination Buttons -->
+        <div class="d-flex justify-content-center mt-4"
+             th:with="totalPages=${(tasks.size() + size - 1) / size}">
+
+            <!-- Previous -->
+            <a class="btn btn-outline-secondary me-2"
+               th:if="${page > 0}"
+               th:href="@{/tasks(page=${page - 1})}">
+                ⬅ Prev
+            </a>
+
+            <!-- Page Numbers -->
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a class="btn btn-outline-primary me-1"
+                   th:classappend="${i == page} ? ' active'"
+                   th:href="@{/tasks(page=${i})}"
+                   th:text="${i + 1}">
+                </a>
+            </span>
+
+            <!-- Next -->
+            <a class="btn btn-outline-secondary ms-2"
+               th:if="${page < totalPages - 1}"
+               th:href="@{/tasks(page=${page + 1})}">
+                Next ➡
+            </a>
+
+        </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</html>

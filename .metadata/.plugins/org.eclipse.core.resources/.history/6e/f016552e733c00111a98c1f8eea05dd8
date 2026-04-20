@@ -1,0 +1,35 @@
+package com.frontend.exception;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.task.exception.*;
+
+@ControllerAdvice
+public class GlobalExceptionHandlerUI {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public String handleNotFound(ResourceNotFoundException ex, Model model) {
+        model.addAttribute("status", 404);
+        model.addAttribute("error", "Not Found");
+        model.addAttribute("message", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public String handleDuplicate(DuplicateResourceException ex, Model model) {
+        model.addAttribute("status", 409);
+        model.addAttribute("error", "Conflict");
+        model.addAttribute("message", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleGeneric(Exception ex, Model model) {
+        model.addAttribute("status", 500);
+        model.addAttribute("error", "Internal Server Error");
+        model.addAttribute("message", ex.getMessage());
+        return "error";
+    }
+}

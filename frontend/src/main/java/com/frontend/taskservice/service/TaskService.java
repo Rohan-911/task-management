@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
 
 import com.frontend.taskservice.dto.TaskDTO;
-import com.frontend.config.JwtInterceptor;
 
 @Service
 public class TaskService {
@@ -43,23 +43,25 @@ public class TaskService {
         }
     }
 
-    // ✅ DELETE
-    public void deleteTask(Integer id) {
-        restClient.delete()
-                .uri("/api/tasks/delete/{id}", id)
-                .retrieve()
-                .toBodilessEntity();
-    }
+    
 
     // ✅ GET BY ID
     public TaskDTO getTaskById(Integer id) {
-        return restClient.get()
+       try {
+    	   return restClient.get()
                 .uri("/api/tasks/{id}", id)
                 .retrieve()
                 .body(TaskDTO.class);
-    }
+    } catch (HttpStatusCodeException ex) {
 
-    // ✅ UPDATE — Content-Type must be set so backend @RequestBody parses correctly
+        // 🔥 Extract message from backend
+        String response = ex.getResponseBodyAsString();
+
+        throw new RuntimeException(response);
+    }
+}
+
+  
     public TaskDTO updateTask(Integer id, TaskDTO task) {
         return restClient.put()
                 .uri("/api/tasks/update/{id}", id)
@@ -101,4 +103,21 @@ public class TaskService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<TaskDTO>>() {});
     }
-}
+    public List<TaskDTO> filterTasks(String status, String priority) {
+       
+            return restClient.get()
+                    .uri("/api/tasks/filter?status=" + status + "&priority=" + priority)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<TaskDTO>>() {});
+        
+    }
+    public Long countTasksByStatus(String status) {
+        
+            return restClient.get()
+                    .uri("/api/tasks/count/" + status)
+                    .retrieve()
+                    .body(Long.class);
+        }
+    }
+    
+    

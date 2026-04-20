@@ -1,0 +1,82 @@
+package com.frontend.userservice.controller;
+
+import com.frontend.userservice.dto.AuthResponseDTO;
+import com.frontend.userservice.dto.LoginRequestDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestClient;
+
+@Controller
+public class AuthController {
+
+    private final RestClient restClient;
+
+    @Value("${backend.url:http://localhost:8080}")
+    private String backendUrl;
+
+    public AuthController() {
+        this.restClient = RestClient.create();
+    }
+
+    @PostMapping("/login-action")
+    public String login(@RequestParam String username,
+                        @RequestParam String password,
+                        @RequestParam(required = false) String redirect, 
+                        HttpServletRequest request,
+                        Model model) {
+
+        try {
+            LoginRequestDTO loginReq = new LoginRequestDTO();
+            loginReq.setUsername(username);
+            loginReq.setPassword(password);
+
+            AuthResponseDTO response = restClient.post()
+                    .uri(backendUrl + "/api/auth/login")
+                    .body(loginReq)
+                    .retrieve()
+                    .body(AuthResponseDTO.class);
+
+            System.out.println("LOGIN TOKEN = " + (response != null ? response.getToken() : null));
+
+            if (response != null && response.getToken() != null) {
+
+                HttpSession session = request.getSession();
+                session.setAttribute("JWT_TOKEN", response.getToken());
+                session.setAttribute("USERNAME", username);
+
+                // 🔥 THIS MUST COME FIRST
+                if (redirect != null && !redirect.isBlank()) {
+                    return "redirect:" + redirect;
+                }
+
+                // THEN role logic
+                boolean isAdmin = response.getRoles() != null &&
+                        response.getRoles().stream()
+                                .anyMatch(r -> r.equalsIgnoreCase("admin"));
+
+                if (isAdmin) {
+                    return "redirect:/admin-dashboard";
+                } else {
+                    return "redirect:/user-dashboard";
+                }
+
+            } else {
+                model.addAttribute("error", "Invalid credentials");
+                return "userservice/login"; 
+            }
+
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            model.addAttribute("error", "Invalid Username or Password");
+            return "userservice/login";
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Login failed: " + e.getMessage());
+            return "userservice/login";
+        }
+    }
+}

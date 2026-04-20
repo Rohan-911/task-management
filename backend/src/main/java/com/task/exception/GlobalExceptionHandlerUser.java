@@ -32,7 +32,7 @@ public class GlobalExceptionHandlerUser {
         error.put("timestamp", LocalDateTime.now());
         error.put("status", 409);
         error.put("error", "Conflict");
-        error.put("message", ex.getMessage());
+        error.put("message", ex.getMessage()); 
 
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Create Task</title>
+
+    <!-- Bootstrap + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Segoe UI', sans-serif;
+            color: #e2e8f0;
+        }
+
+        .form-wrapper {
+            max-width: 900px;
+            margin: 60px auto;
+        }
+
+        .form-card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .form-title {
+            text-align: center;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #38bdf8;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            color: #cbd5f5;
+        }
+
+        .input-group-text {
+            background: #2563eb;
+            color: white;
+            border: none;
+        }
+
+        .form-control, .form-select {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 8px;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 8px rgba(96,165,250,0.5);
+            background: #1e293b;
+            color: #fff;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .btn-custom {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: linear-gradient(to right, #22c55e, #16a34a);
+            border: none;
+            color: white;
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .btn-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: none;
+        }
+
+        .btn-back:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-wrapper">
+
+    <div class="form-card">
+
+        <h2 class="form-title">🌙 Create New Task</h2>
+
+        <form th:action="@{/tasks/create}" th:object="${task}" method="post">
+
+            <!-- BASIC INFO -->
+            <div class="section-title">Basic Info</div>
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Task ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                        <input type="number" th:field="*{taskID}" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Task Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                        <input type="text" th:field="*{taskName}" class="form-control" required>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+            </div>
+
+            <!-- DETAILS -->
+            <div class="section-title">Task Details</div>
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Status</label>
+                    <select th:field="*{status}" class="form-select">
+                        <option>Pending</option>
+                        <option>In Progress</option>
+                        <option>Completed</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Priority</label>
+                    <select th:field="*{priority}" class="form-select">
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- ASSIGNMENT -->
+            <div class="section-title">Assignment</div>
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">User ID</label>
+                    <input type="number" th:field="*{userID}" class="form-control">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Project ID</label>
+                    <input type="number" th:field="*{projectID}" class="form-control">
+                </div>
+
+            </div>
+
+            <!-- DATE -->
+            <div class="mb-3">
+                <label class="form-label">Due Date</label>
+                <input type="date" th:field="*{dueDate}" class="form-control">
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/tasks" class="btn btn-custom btn-back">⬅ Back</a>
+                <button type="submit" class="btn btn-custom btn-save">🚀 Save Task</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
