@@ -23,7 +23,7 @@
             </div>
 
             <!-- FORM -->
-            <form th:action="@{/update-user/{id}(id=${user.userId})}"
+            <form th:action="@{/api/users/{id}/edit(id=${user.userId})}"
                   method="post"
                   th:object="${user}">
 
@@ -39,15 +39,7 @@
                 <div style="color:red; font-size:13px; margin-bottom:10px;"
                      th:errors="*{username}"></div>
 
-                <!-- PASSWORD -->
-                <label style="font-weight:600;">Password</label>
-                <input type="password"
-                       th:field="*{password}"
-                       placeholder="Enter New Password"
-                       style="width:100%; padding:10px; border-radius:6px;
-                              border:1px solid #ccc; margin-bottom:5px;">
-                <div style="color:red; font-size:13px; margin-bottom:10px;"
-                     th:errors="*{password}"></div>
+                <input type="hidden" name="password" value="dummy">
 
                 <!-- EMAIL -->
                 <label style="font-weight:600;">Email</label>

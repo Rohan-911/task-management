@@ -16,7 +16,7 @@
             <span th:text="${error}"></span>
         </div>
 
-        <form action="/assign-roles-action" method="post"
+        <form th:action="@{${user != null ? '/api/users/' + user.userId + '/assign-roles' : '#'}}" method="post"
               style="margin-top:20px; background:white; padding:25px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
 
             <div style="margin-bottom:20px;">
@@ -29,13 +29,13 @@
                            th:styleappend="${user != null ? 'background:#f1f5f9; color:#64748b;' : ''}">
                            
                     <button type="button" th:if="${user == null}"
-                            onclick="var id = document.getElementById('userIdInput').value; if(id) window.location.href='/assign-roles-by-id/' + id;"
+                            onclick="var id = document.getElementById('userIdInput').value; if(id) window.location.href='/api/users/' + id + '/assign-roles';"
                             style="background:#f1f5f9; border:1px solid #cbd5e1; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#475569; white-space:nowrap; transition:all 0.2s;"
                             onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">
                         Fetch Current Roles
                     </button>
                     
-                    <a th:if="${user != null}" href="/assign-roles-by-id"
+                    <a th:if="${user != null}" href="/api/users/assign-roles"
                        style="background:#fef2f2; border:1px solid #fca5a5; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:600; color:#ef4444; text-decoration:none; white-space:nowrap; display:flex; align-items:center;">
                         Clear
                     </a>

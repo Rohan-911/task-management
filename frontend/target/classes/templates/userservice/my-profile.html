@@ -16,7 +16,7 @@
         <div th:if="${error}" style="background:#fee2e2; color:#b91c1c; padding:12px 20px; border-radius:8px; margin-bottom:20px; border-left:4px solid #ef4444;" th:text="${error}">
         </div>
 
-        <form th:action="@{/current-user}" th:object="${user}" method="post">
+        <form th:action="@{/api/users/me}" th:object="${user}" method="post">
             
             <div style="margin-bottom:15px;">
                 <label style="font-weight:600; color:#475569; margin-bottom:5px; display:block;">Username</label>

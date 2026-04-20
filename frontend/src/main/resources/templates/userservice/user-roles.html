@@ -8,7 +8,11 @@
 
         <h3 style="text-align:center; color:#1e293b; font-weight:700;">Get User Roles</h3>
 
-        <form action="/user-roles/result" method="get"
+        <div th:if="${error}" style="background:#fee2e2; color:#b91c1c; padding:12px 20px; border-radius:8px; margin-top:20px; border-left:4px solid #ef4444;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form action="/api/users/roles" method="get"
               style="margin-top:20px;">
 
             <input name="id" placeholder="Enter User ID (e.g. 1)"
