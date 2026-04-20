@@ -23,6 +23,8 @@ public class ViewController {
         this.userService = userService;
     }
 
+
+   
     private String extractErrorMessage(Exception e) {
         if (e instanceof org.springframework.web.client.HttpClientErrorException) {
             org.springframework.web.client.HttpClientErrorException clientEx = (org.springframework.web.client.HttpClientErrorException) e;
@@ -37,6 +39,7 @@ public class ViewController {
     }
 
     @GetMapping("/login")
+
     public String home() {
         return "userservice/login";
     }

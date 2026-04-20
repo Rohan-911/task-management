@@ -215,15 +215,15 @@
 
         <div th:if="${session.jwtToken == null}">
             <h3 style="margin-top: 0; font-size: 16px;">Login to Access API Endpoints</h3>
-            <form action="/do-login" method="post" class="login-form" autocomplete="off">
+            <form th:action="@{/category/do-login}" method="post" class="login-form" autocomplete="off">
                 <input name="username" placeholder="Username" required autocomplete="off"/>
                 <input type="password" name="password" placeholder="Password" required autocomplete="new-password"/>
                 <button type="submit" class="btn">Login</button>
             </form>
         </div>
         <div th:if="${session.jwtToken != null}">
-            <span class="auth-status">Authenticated ✓</span>
-            <a href="/logout" class="btn btn-logout">Logout</a>
+            <span class="auth-status" th:text="'Authenticated as ' + ${session.USERNAME} + ' ✓'">Authenticated ✓</span>
+            <a th:href="@{/category/logout}" class="btn btn-logout">Logout</a>
         </div>
     </div>
 
@@ -239,37 +239,37 @@
         </thead>
         <tbody>
             <tr>
-                <td><a href="/categories/all" class="btn-link">GET /api/categories/all</a></td>
-                <td><a href="/categories/all" class="btn">Run All</a></td>
+                <td><a th:href="@{/category/categories/all}" class="btn-link">GET /api/categories/all</a></td>
+                <td><a th:href="@{/category/categories/all}" class="btn">Run All</a></td>
                 <td>Retrieve all existing task categories.</td>
             </tr>
             <tr>
-                <td><a href="/categories/search" class="btn-link">GET /api/categories/search</a></td>
-                <td><a href="/categories/search" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/categories/search}" class="btn-link">GET /api/categories/search</a></td>
+                <td><a th:href="@{/category/categories/search}" class="btn">Open Form</a></td>
                 <td>Find a specific category using its ID.</td>
             </tr>
             <tr>
-                <td><a href="/categories/search/name" class="btn-link">GET /api/categories/search/name</a></td>
-                <td><a href="/categories/search/name" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/categories/search/name}" class="btn-link">GET /api/categories/search/name</a></td>
+                <td><a th:href="@{/category/categories/search/name}" class="btn">Open Form</a></td>
                 <td>Search for categories by their display name.</td>
             </tr>
             <tr>
-                <td><a href="/categories/task" class="btn-link">GET /api/categories/task</a></td>
-                <td><a href="/categories/task" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/categories/task}" class="btn-link">GET /api/categories/task</a></td>
+                <td><a th:href="@{/category/categories/task}" class="btn">Open Form</a></td>
                 <td>Get categories associated with a specific Task ID.</td>
             </tr>
             <tr>
-                <td><a href="/categories/create" class="btn-link">POST /api/categories/create</a></td>
+                <td><a th:href="@{/category/categories/create}" class="btn-link">POST /api/categories/create</a></td>
                 <td>
-                    <a th:if="${session.isAdmin == true}" href="/categories/create" class="btn">Open Form</a>
+                    <a th:if="${session.isAdmin == true}" th:href="@{/category/categories/create}" class="btn">Open Form</a>
                     <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
                 </td>
                 <td>Register a new category in the system.</td>
             </tr>
             <tr>
-                <td><a href="/categories/delete" class="btn-link">DELETE /api/categories/delete</a></td>
+                <td><a th:href="@{/category/categories/delete}" class="btn-link">DELETE /api/categories/delete</a></td>
                 <td>
-                    <a th:if="${session.isAdmin == true}" href="/categories/delete" class="btn">Open Form</a>
+                    <a th:if="${session.isAdmin == true}" th:href="@{/category/categories/delete}" class="btn">Open Form</a>
                     <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
                 </td>
                 <td>Permanently remove a category by its ID.</td>
@@ -289,42 +289,42 @@
         </thead>
         <tbody>
             <tr>
-                <td><a href="/notifications/all" class="btn-link">GET /api/notifications/all</a></td>
-                <td><a href="/notifications/all" class="btn">Run All</a></td>
+                <td><a th:href="@{/category/notifications/all}" class="btn-link">GET /api/notifications/all</a></td>
+                <td><a th:href="@{/category/notifications/all}" class="btn">Run All</a></td>
                 <td>View a list of all system notifications.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/id" class="btn-link">GET /api/notifications/id</a></td>
-                <td><a href="/notifications/id" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/notifications/id}" class="btn-link">GET /api/notifications/id</a></td>
+                <td><a th:href="@{/category/notifications/id}" class="btn">Open Form</a></td>
                 <td>Get details of a single notification by ID.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/user" class="btn-link">GET /api/notifications/user</a></td>
-                <td><a href="/notifications/user" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/notifications/user}" class="btn-link">GET /api/notifications/user</a></td>
+                <td><a th:href="@{/category/notifications/user}" class="btn">Open Form</a></td>
                 <td>Fetch notifications sent to a specific user.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/search" class="btn-link">GET /api/notifications/search</a></td>
-                <td><a href="/notifications/search" class="btn">Open Form</a></td>
+                <td><a th:href="@{/category/notifications/search}" class="btn-link">GET /api/notifications/search</a></td>
+                <td><a th:href="@{/category/notifications/search}" class="btn">Open Form</a></td>
                 <td>Filter notifications containing specific text.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/latest" class="btn-link">GET /api/notifications/latest</a></td>
-                <td><a href="/notifications/latest" class="btn">Run Latest</a></td>
+                <td><a th:href="@{/category/notifications/latest}" class="btn-link">GET /api/notifications/latest</a></td>
+                <td><a th:href="@{/category/notifications/latest}" class="btn">Run Latest</a></td>
                 <td>Fetch the most recently generated notifications.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/create" class="btn-link">POST /api/notifications/create</a></td>
+                <td><a th:href="@{/category/notifications/create}" class="btn-link">POST /api/notifications/create</a></td>
                 <td>
-                    <a th:if="${session.isAdmin == true}" href="/notifications/create" class="btn">Open Form</a>
+                    <a th:if="${session.isAdmin == true}" th:href="@{/category/notifications/create}" class="btn">Open Form</a>
                     <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
                 </td>
                 <td>Send a new notification to a user.</td>
             </tr>
             <tr>
-                <td><a href="/notifications/delete" class="btn-link">DELETE /api/notifications/delete</a></td>
+                <td><a th:href="@{/category/notifications/delete}" class="btn-link">DELETE /api/notifications/delete</a></td>
                 <td>
-                    <a th:if="${session.isAdmin == true}" href="/notifications/delete" class="btn">Open Form</a>
+                    <a th:if="${session.isAdmin == true}" th:href="@{/category/notifications/delete}" class="btn">Open Form</a>
                     <span th:if="${session.isAdmin != true}" class="locked-badge">Admin Only (Locked)</span>
                 </td>
                 <td>Delete a specific notification record.</td>

@@ -104,7 +104,7 @@
         <button type="submit">Execute API</button>
     </form>
 
-    <a href="/" class="back-link">← Back to Dashboard</a>
+    <a th:href="@{/category/}" class="back-link">← Back to Dashboard</a>
 </div>
 
 <script th:if="${isDynamicPath}">
@@ -115,7 +115,7 @@
             e.preventDefault();
             const inputs = this.querySelectorAll('input');
             inputs.forEach(input => {
-                action = action.replace('{' + input.name + '}', input.value);
+                action = action.replace('{' + input.name + '}', encodeURIComponent(input.value));
             });
             window.location.href = action;
         }

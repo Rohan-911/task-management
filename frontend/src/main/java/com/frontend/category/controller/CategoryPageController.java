@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
+@RequestMapping("/category")
 public class CategoryPageController {
 
     private final CategoryClient categoryClient;
@@ -45,26 +46,30 @@ public class CategoryPageController {
             com.frontend.category.dto.AuthResponseDTO authRes = authClient.login(loginReq);
             
             if (authRes != null && authRes.getToken() != null) {
-                request.getSession().setAttribute("jwtToken", authRes.getToken());
+                HttpSession session = request.getSession();
+                session.setAttribute("jwtToken", authRes.getToken());
+                session.setAttribute("USERNAME", username);
                 
                 // Set admin status based on roles
                 boolean isAdmin = authRes.getRoles() != null && 
                                   authRes.getRoles().stream()
-                                         .anyMatch(r -> r.equalsIgnoreCase("ADMIN") || r.equalsIgnoreCase("ROLE_ADMIN"));
-                request.getSession().setAttribute("isAdmin", isAdmin);
+                                         .anyMatch(r -> r.equalsIgnoreCase("admin") || 
+                                                        r.equalsIgnoreCase("ADMIN") || 
+                                                        r.equalsIgnoreCase("ROLE_ADMIN"));
+                session.setAttribute("isAdmin", isAdmin);
             } else {
                 redirectAttributes.addFlashAttribute("loginError", "Unauthorized User: Invalid username or password.");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("loginError", "Unauthorized User: Login failed.");
         }
-        return "redirect:/";
+        return "redirect:/category/";
     }
 
     @GetMapping("/logout")
     public String logout(jakarta.servlet.http.HttpServletRequest request) {
         request.getSession().invalidate();
-        return "redirect:/";
+        return "redirect:/category/";
     }
 
     @GetMapping("/")
@@ -145,70 +150,70 @@ public class CategoryPageController {
             case "categoryById":
                 model.addAttribute("apiTitle", "Search Category By ID");
                 model.addAttribute("apiPath", "GET /api/categories/search/{id}");
-                model.addAttribute("actionUrl", "/categories/search/{id}");
+                model.addAttribute("actionUrl", "/category/categories/search/{id}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("id", "Category ID", "number", "Enter ID")));
                 break;
             case "categoryByName":
                 model.addAttribute("apiTitle", "Search Category By Name");
                 model.addAttribute("apiPath", "GET /api/categories/search/name/{name}");
-                model.addAttribute("actionUrl", "/categories/search/name/{name}");
+                model.addAttribute("actionUrl", "/category/categories/search/name/{name}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("name", "Category Name", "text", "Enter Name")));
                 break;
             case "categoryByTask":
                 model.addAttribute("apiTitle", "Search Category By Task");
                 model.addAttribute("apiPath", "GET /api/categories/task/{taskId}");
-                model.addAttribute("actionUrl", "/categories/task/{taskId}");
+                model.addAttribute("actionUrl", "/category/categories/task/{taskId}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("taskId", "Task ID", "number", "Enter Task ID")));
                 break;
             case "categoryDelete":
                 model.addAttribute("apiTitle", "Delete Category");
                 model.addAttribute("apiPath", "DELETE /api/categories/delete/{id}");
-                model.addAttribute("actionUrl", "/categories/delete/{id}");
+                model.addAttribute("actionUrl", "/category/categories/delete/{id}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("id", "Category ID", "number", "Enter ID to Delete")));
                 break;
             case "notificationById":
                 model.addAttribute("apiTitle", "Search Notification By ID");
                 model.addAttribute("apiPath", "GET /api/notifications/id/{id}");
-                model.addAttribute("actionUrl", "/notifications/id/{id}");
+                model.addAttribute("actionUrl", "/category/notifications/id/{id}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("id", "Notification ID", "number", "Enter ID")));
                 break;
             case "notificationByUser":
                 model.addAttribute("apiTitle", "Search Notification By User");
                 model.addAttribute("apiPath", "GET /api/notifications/user/{userId}");
-                model.addAttribute("actionUrl", "/notifications/user/{userId}");
+                model.addAttribute("actionUrl", "/category/notifications/user/{userId}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("userId", "User ID", "number", "Enter User ID")));
                 break;
             case "notificationSearch":
                 model.addAttribute("apiTitle", "Search Notification Text");
                 model.addAttribute("apiPath", "GET /api/notifications/search/{text}");
-                model.addAttribute("actionUrl", "/notifications/search/{text}");
+                model.addAttribute("actionUrl", "/category/notifications/search/{text}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("text", "Search Text", "text", "Enter Text")));
                 break;
             case "notificationDelete":
                 model.addAttribute("apiTitle", "Delete Notification");
                 model.addAttribute("apiPath", "DELETE /api/notifications/delete/{id}");
-                model.addAttribute("actionUrl", "/notifications/delete/{id}");
+                model.addAttribute("actionUrl", "/category/notifications/delete/{id}");
                 model.addAttribute("isDynamicPath", true);
                 model.addAttribute("fields", List.of(new FormField("id", "Notification ID", "number", "Enter ID to Delete")));
                 break;
             case "categoryCreate":
                 model.addAttribute("apiTitle", "Create Category");
                 model.addAttribute("apiPath", "POST /api/categories/create");
-                model.addAttribute("actionUrl", "/categories/create");
+                model.addAttribute("actionUrl", "/category/categories/create");
                 model.addAttribute("method", "POST");
                 model.addAttribute("fields", List.of(new FormField("categoryName", "Category Name", "text", "Enter New Category Name")));
                 break;
             case "notificationCreate":
                 model.addAttribute("apiTitle", "Create Notification");
                 model.addAttribute("apiPath", "POST /api/notifications/create");
-                model.addAttribute("actionUrl", "/notifications/create");
+                model.addAttribute("actionUrl", "/category/notifications/create");
                 model.addAttribute("method", "POST");
                 model.addAttribute("fields", List.of(
                     new FormField("text", "Notification Text", "text", "Enter Message"),
@@ -239,7 +244,7 @@ public class CategoryPageController {
     public String getAllCategories(HttpSession session, @RequestParam(defaultValue = "0") int page, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         List<Category> all = categoryClient.getAll();
         int pageSize = 5;
@@ -252,7 +257,7 @@ public class CategoryPageController {
         model.addAttribute("result", all.subList(start, end));
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("baseUrl", "/categories/all");
+        model.addAttribute("baseUrl", "/category/categories/all");
         return "CategoryService/result";
     }
 
@@ -260,11 +265,11 @@ public class CategoryPageController {
     public String getCategoryById(HttpSession session, @PathVariable Integer id, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (id < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             Category cat = categoryClient.getById(id);
@@ -280,7 +285,7 @@ public class CategoryPageController {
     public String searchByName(HttpSession session, @PathVariable String name, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             List<Category> cats = categoryClient.searchByName(name);
@@ -296,11 +301,11 @@ public class CategoryPageController {
     public String getByTask(HttpSession session, @PathVariable Integer taskId, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (taskId < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             List<Category> cats = categoryClient.getByTask(taskId);
@@ -316,17 +321,17 @@ public class CategoryPageController {
     public String createCategory(HttpSession session, @ModelAttribute Category category, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         
         if (!Boolean.TRUE.equals(session.getAttribute("isAdmin"))) {
             model.addAttribute("result", "Access Denied: Only Admins can create categories.");
-            return "result";
+            return "CategoryService/result";
         }
         
         if (category.getCategoryName() != null && category.getCategoryName().matches(".*\\d.*")) {
             model.addAttribute("result", "invalid input");
-            return "result";
+            return "CategoryService/result";
         }
         
         try {
@@ -336,7 +341,7 @@ public class CategoryPageController {
                         .anyMatch(c -> c.getCategoryName().trim().equalsIgnoreCase(category.getCategoryName().trim()));
                 if (exists) {
                     model.addAttribute("result", "Category already exist");
-                    return "result";
+                    return "CategoryService/result";
                 }
             }
         } catch (Exception e) {
@@ -358,18 +363,18 @@ public class CategoryPageController {
                                  @ModelAttribute Category category, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (!Boolean.TRUE.equals(session.getAttribute("isAdmin"))) {
             model.addAttribute("result", "Access Denied: Only Admins can update categories.");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             categoryClient.update(id, category);
-            return "redirect:/";
+            return "redirect:/category/";
         } catch (Exception e) {
             model.addAttribute("result", "Error updating category: " + e.getMessage());
-            return "result";
+            return "CategoryService/result";
         }
     }
 
@@ -377,23 +382,23 @@ public class CategoryPageController {
     public String deleteCategory(HttpSession session, @PathVariable Integer id, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (!Boolean.TRUE.equals(session.getAttribute("isAdmin"))) {
             model.addAttribute("result", "Access Denied: Only Admins can delete categories.");
-            return "result";
+            return "CategoryService/result";
         }
         if (id < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             categoryClient.delete(id);
             model.addAttribute("result", "The category has been removed");
-            return "result";
+            return "CategoryService/result";
         } catch (Exception e) {
             model.addAttribute("result", "Invalid id. Its not in the database");
-            return "result";
+            return "CategoryService/result";
         }
     }
 
@@ -401,7 +406,7 @@ public class CategoryPageController {
     public String getAllNotifications(HttpSession session, @RequestParam(defaultValue = "0") int page, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         List<Notification> all = notificationClient.getAll();
         int pageSize = 5;
@@ -414,7 +419,7 @@ public class CategoryPageController {
         model.addAttribute("result", all.subList(start, end));
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("baseUrl", "/notifications/all");
+        model.addAttribute("baseUrl", "/category/notifications/all");
         return "CategoryService/result";
     }
 
@@ -422,11 +427,11 @@ public class CategoryPageController {
     public String getNotificationById(HttpSession session, @PathVariable Integer id, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (id < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             Notification notif = notificationClient.getById(id);
@@ -442,11 +447,11 @@ public class CategoryPageController {
     public String getByUser(HttpSession session, @PathVariable Integer userId, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (userId < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             List<Notification> notifs = notificationClient.getByUser(userId);
@@ -462,7 +467,7 @@ public class CategoryPageController {
     public String searchNotification(HttpSession session, @PathVariable String text, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             List<Notification> notifs = notificationClient.search(text);
@@ -478,7 +483,7 @@ public class CategoryPageController {
     public String latestNotifications(HttpSession session, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         model.addAttribute("result", notificationClient.getLatest());
         return "CategoryService/result";
@@ -488,7 +493,7 @@ public class CategoryPageController {
     public String createNotification(HttpSession session, @ModelAttribute Notification notification, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             notificationClient.create(notification);
@@ -505,29 +510,29 @@ public class CategoryPageController {
                                      @ModelAttribute Notification notification, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (!Boolean.TRUE.equals(session.getAttribute("isAdmin"))) {
             model.addAttribute("result", "Access Denied: Only Admins can update notifications.");
-            return "result";
+            return "CategoryService/result";
         }
         notificationClient.update(id, notification);
-        return "redirect:/";
+        return "redirect:/category/";
     }
 
     @GetMapping("/notifications/delete/{id}")
     public String deleteNotification(HttpSession session, @PathVariable Integer id, Model model) {
         if (session.getAttribute("jwtToken") == null) {
             model.addAttribute("result", "Access Denied: Please login first to access the API.");
-            return "result";
+            return "CategoryService/result";
         }
         if (!Boolean.TRUE.equals(session.getAttribute("isAdmin"))) {
             model.addAttribute("result", "Access Denied: Only Admins can delete notifications.");
-            return "result";
+            return "CategoryService/result";
         }
         if (id < 0) {
             model.addAttribute("result", "negative nos not allowed");
-            return "result";
+            return "CategoryService/result";
         }
         try {
             notificationClient.delete(id);

@@ -141,7 +141,7 @@
         <div th:if="${!(result instanceof T(java.lang.String)) and !result.isEmpty()}">
             
             <!-- Category Table -->
-            <table th:if="${result[0] instanceof T(com.example.demo.model.Category)}">
+            <table th:if="${result[0] instanceof T(com.frontend.category.model.Category)}">
                 <thead>
                     <tr>
                         <th>Category ID</th>
@@ -157,7 +157,7 @@
             </table>
 
             <!-- Notification Table -->
-            <table th:if="${result[0] instanceof T(com.example.demo.model.Notification)}">
+            <table th:if="${result[0] instanceof T(com.frontend.category.model.Notification)}">
                 <thead>
                     <tr>
                         <th>Notification ID</th>
@@ -177,7 +177,7 @@
             </table>
             
             <!-- Fallback if it's some other type of list -->
-            <div th:if="${!(result[0] instanceof T(com.example.demo.model.Category)) and !(result[0] instanceof T(com.example.demo.model.Notification))}">
+            <div th:if="${!(result[0] instanceof T(com.frontend.category.model.Category)) and !(result[0] instanceof T(com.frontend.category.model.Notification))}">
                 <pre th:text="${result}"></pre>
             </div>
         </div>
@@ -190,7 +190,7 @@
     </div>
 
     <div class="btn-container">
-        <a href="/" class="btn">Back to Dashboard</a>
+        <a th:href="@{/category/}" class="btn">Back to Dashboard</a>
     </div>
 </div>
 

@@ -58,7 +58,9 @@ public class AuthController {
                 // THEN role logic
                 boolean isAdmin = response.getRoles() != null &&
                         response.getRoles().stream()
-                                .anyMatch(r -> r.equalsIgnoreCase("admin"));
+                                .anyMatch(r -> r.equalsIgnoreCase("admin") || r.equalsIgnoreCase("ROLE_ADMIN"));
+
+                session.setAttribute("isAdmin", isAdmin);
 
                 if (isAdmin) {
                     return "redirect:/admin-dashboard";
